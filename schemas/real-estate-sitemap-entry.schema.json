@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-factory.local/schemas/real-estate-sitemap-entry.schema.json",
+  "title": "Real Estate Sitemap Entry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["canonical_id", "loc", "lastmod"],
+  "properties": {
+    "canonical_id": {"type": "string", "pattern": "^CAN-[a-f0-9]{20}$"},
+    "loc": {"type": "string", "format": "uri", "pattern": "^https://"},
+    "lastmod": {"type": "string", "format": "date-time"}
+  }
+}
