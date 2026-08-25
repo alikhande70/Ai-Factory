@@ -1,0 +1,18 @@
+{
+  "snapshot_version": 1,
+  "expected_stage": "CODE_QUALIFIED",
+  "controls": [
+    {"control_id":"multi_mission_isolation","status":"PASS","evidence_ref":"github-actions://32856981540"},
+    {"control_id":"backup_restore_integrity","status":"PASS","evidence_ref":"github-actions://32861957643"},
+    {"control_id":"secret_reference_boundary","status":"PASS","evidence_ref":"github-actions://32868738282"},
+    {"control_id":"audit_archival_integrity","status":"PASS","evidence_ref":"github-actions://32868992458"},
+    {"control_id":"incident_response_state_machine","status":"PASS","evidence_ref":"github-actions://32869313829"},
+    {"control_id":"supply_chain_inventory","status":"PASS","evidence_ref":"github-actions://32869793898"},
+    {"control_id":"slo_evidence_contract","status":"PASS","evidence_ref":"github-actions://32870015401"},
+    {"control_id":"ci_performance_regression","status":"PASS","evidence_ref":"github-actions://32870221506"},
+    {"control_id":"github_branch_protection","status":"FAIL","evidence_ref":"github-branch://main/protected=false"},
+    {"control_id":"production_secret_provider","status":"UNVERIFIED","evidence_ref":null},
+    {"control_id":"offsite_recovery","status":"UNVERIFIED","evidence_ref":null},
+    {"control_id":"production_slo_evidence","status":"UNVERIFIED","evidence_ref":null}
+  ]
+}
