@@ -7,14 +7,18 @@ from .integrity import (
     freshness_score,
     transition_listing_state,
 )
+from .inventory import InventoryQuery, PublisherTrustEvidence, SQLiteInventoryStore
 from .ranking import RankingDecision, rank_listing
 
 __all__ = [
     "FreshnessPolicy",
+    "InventoryQuery",
     "ListingCandidate",
     "ListingState",
+    "PublisherTrustEvidence",
     "RankingDecision",
     "RightsBasis",
+    "SQLiteInventoryStore",
     "SearchSignals",
     "completeness_score",
     "duplicate_fingerprint",
