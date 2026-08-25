@@ -21,7 +21,11 @@ _ALLOWED={
 
 @dataclass(frozen=True)
 class TransitionContext:
-    evidence_ids: tuple[str,...]=field(default_factory=tuple); reviewer_ids: tuple[str,...]=field(default_factory=tuple); blocking_objections: tuple[str,...]=field(default_factory=tuple); human_approval_id: str|None=None
+    evidence_ids: tuple[str,...]=field(default_factory=tuple)
+    reviewer_ids: tuple[str,...]=field(default_factory=tuple)
+    worker_ids: tuple[str,...]=field(default_factory=tuple)
+    blocking_objections: tuple[str,...]=field(default_factory=tuple)
+    human_approval_id: str|None=None
 
 def validate_transition(current:TaskState,target:TaskState,ctx:TransitionContext|None=None)->None:
     ctx=ctx or TransitionContext()
@@ -30,6 +34,7 @@ def validate_transition(current:TaskState,target:TaskState,ctx:TransitionContext
     if target is TaskState.VERIFIED:
         if not ctx.evidence_ids: raise ValueError("VERIFIED requires evidence")
         if not ctx.reviewer_ids: raise ValueError("VERIFIED requires an independent reviewer")
+        if set(ctx.reviewer_ids) & set(ctx.worker_ids): raise ValueError("VERIFIED requires reviewer independence from task workers")
         if ctx.blocking_objections: raise ValueError("VERIFIED forbidden while blocking objections exist")
     if current is TaskState.AWAITING_HUMAN_APPROVAL and target is TaskState.IN_PROGRESS and not ctx.human_approval_id: raise ValueError("resuming protected work requires human approval evidence")
 
