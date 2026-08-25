@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 import tempfile
 import unittest
 
@@ -254,8 +253,8 @@ class Phase9BoundedQualificationTests(unittest.TestCase):
                             True,
                             (f"Q-{case.case_id}",) if case.case_id in factory_covered else (),
                             1.0 if case.case_id in factory_covered else 0.0,
-                            1.0,
-                            0,
+                            1.0 if case.case_id in factory_covered else 0.0,
+                            int(factory_result.latency_ms),
                         )
                         for case in cases
                     ),
@@ -269,7 +268,7 @@ class Phase9BoundedQualificationTests(unittest.TestCase):
                             (f"Q-{case.case_id}",) if case.case_id in simple_covered else (),
                             1.0 if case.case_id in simple_covered else 0.0,
                             1.0 if case.case_id in simple_covered else 0.0,
-                            0,
+                            int(baseline_result.latency_ms),
                         )
                         for case in cases
                     ),
@@ -295,6 +294,8 @@ class Phase9BoundedQualificationTests(unittest.TestCase):
                 self.assertGreater(
                     summaries["CONTROLLED-SIMPLE"]["mean_false_completion_rate"], 0.0
                 )
+                self.assertGreaterEqual(summaries["CONTROLLED-FACTORY"]["mean_latency_ms"], 0.0)
+                self.assertGreaterEqual(summaries["CONTROLLED-SIMPLE"]["mean_latency_ms"], 0.0)
             finally:
                 eval_store.close()
 
