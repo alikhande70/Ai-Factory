@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-factory.local/schemas/audit-archive-manifest.schema.json",
+  "title": "AI Factory Audit Archive Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format_version","archive_file","created_at","cutoff_at","event_count","first_sequence","last_sequence","first_previous_hash","last_event_hash","archive_sha256"],
+  "properties": {
+    "format_version": {"const": 1},
+    "archive_file": {"type": "string", "minLength": 1},
+    "created_at": {"type": "string", "format": "date-time"},
+    "cutoff_at": {"type": "string", "format": "date-time"},
+    "event_count": {"type": "integer", "minimum": 1},
+    "first_sequence": {"const": 1},
+    "last_sequence": {"type": "integer", "minimum": 1},
+    "first_previous_hash": {"const": "GENESIS"},
+    "last_event_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "archive_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}
