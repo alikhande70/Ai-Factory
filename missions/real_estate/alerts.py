@@ -57,6 +57,7 @@ class SQLiteSavedSearchStore:
     def __init__(self, path: str) -> None:
         self._connection = sqlite3.connect(path)
         self._connection.row_factory = sqlite3.Row
+        self._connection.execute("PRAGMA foreign_keys = ON")
         self.apply_migrations()
 
     def close(self) -> None:
@@ -83,6 +84,7 @@ class SQLiteSavedSearchStore:
                         query_fingerprint TEXT NOT NULL,
                         version INTEGER NOT NULL,
                         enabled INTEGER NOT NULL,
+                        primed INTEGER NOT NULL DEFAULT 0,
                         created_at TEXT NOT NULL,
                         updated_at TEXT NOT NULL
                     );
@@ -122,17 +124,22 @@ class SQLiteSavedSearchStore:
         fingerprint = self._query_fingerprint(payload)
         now = self._now_iso()
         existing = self._connection.execute(
-            "SELECT version, query_fingerprint, created_at FROM saved_searches WHERE saved_search_id = ?",
+            "SELECT version, query_fingerprint, primed, created_at FROM saved_searches WHERE saved_search_id = ?",
             (saved.saved_search_id,),
         ).fetchone()
 
         if existing is None:
             version = saved.version
+            primed = 0
             created_at = now
         else:
             previous_version = int(existing["version"])
             previous_fingerprint = str(existing["query_fingerprint"])
-            version = previous_version + 1 if fingerprint != previous_fingerprint else previous_version
+            query_changed = fingerprint != previous_fingerprint
+            version = previous_version + 1 if query_changed else previous_version
+            # A materially edited query must establish a new current-results baseline
+            # before it can emit future alerts, avoiding an edit-triggered alert storm.
+            primed = 0 if query_changed else int(existing["primed"])
             created_at = str(existing["created_at"])
 
         normalized = replace(saved, version=version)
@@ -141,8 +148,8 @@ class SQLiteSavedSearchStore:
                 """
                 INSERT INTO saved_searches(
                     saved_search_id, owner_id, name, query_json, query_fingerprint,
-                    version, enabled, created_at, updated_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    version, enabled, primed, created_at, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(saved_search_id) DO UPDATE SET
                     owner_id = excluded.owner_id,
                     name = excluded.name,
@@ -150,6 +157,7 @@ class SQLiteSavedSearchStore:
                     query_fingerprint = excluded.query_fingerprint,
                     version = excluded.version,
                     enabled = excluded.enabled,
+                    primed = excluded.primed,
                     updated_at = excluded.updated_at
                 """,
                 (
@@ -160,6 +168,7 @@ class SQLiteSavedSearchStore:
                     fingerprint,
                     normalized.version,
                     1 if normalized.enabled else 0,
+                    primed,
                     created_at,
                     now,
                 ),
@@ -167,13 +176,11 @@ class SQLiteSavedSearchStore:
         return normalized
 
     def get(self, saved_search_id: str) -> SavedSearch:
-        row = self._connection.execute(
-            "SELECT * FROM saved_searches WHERE saved_search_id = ?",
-            (saved_search_id,),
-        ).fetchone()
-        if row is None:
-            raise KeyError(saved_search_id)
+        row = self._search_row(saved_search_id)
         return self._saved_from_row(row)
+
+    def is_primed(self, saved_search_id: str) -> bool:
+        return bool(self._search_row(saved_search_id)["primed"])
 
     def enabled(self) -> tuple[SavedSearch, ...]:
         rows = self._connection.execute(
@@ -181,10 +188,47 @@ class SQLiteSavedSearchStore:
         ).fetchall()
         return tuple(self._saved_from_row(row) for row in rows)
 
-    def mark_matches(self, saved: SavedSearch, canonical_ids: tuple[str, ...], *, occurred_at: datetime) -> tuple[AlertEvent, ...]:
+    def establish_baseline(
+        self,
+        saved: SavedSearch,
+        canonical_ids: tuple[str, ...],
+        *,
+        occurred_at: datetime,
+    ) -> None:
+        """Record already-current matches without creating notification events."""
         saved.validate()
         if occurred_at.tzinfo is None:
             raise ValueError("occurred_at must be timezone-aware")
+        occurred = occurred_at.isoformat()
+        with self._connection:
+            for canonical_id in canonical_ids:
+                if not canonical_id.strip():
+                    raise ValueError("canonical_id is required")
+                self._connection.execute(
+                    """
+                    INSERT OR IGNORE INTO alert_matches(
+                        saved_search_id, canonical_id, first_matched_version, first_matched_at
+                    ) VALUES (?, ?, ?, ?)
+                    """,
+                    (saved.saved_search_id, canonical_id, saved.version, occurred),
+                )
+            self._connection.execute(
+                "UPDATE saved_searches SET primed = 1, updated_at = ? WHERE saved_search_id = ?",
+                (occurred, saved.saved_search_id),
+            )
+
+    def mark_matches(
+        self,
+        saved: SavedSearch,
+        canonical_ids: tuple[str, ...],
+        *,
+        occurred_at: datetime,
+    ) -> tuple[AlertEvent, ...]:
+        saved.validate()
+        if occurred_at.tzinfo is None:
+            raise ValueError("occurred_at must be timezone-aware")
+        if not self.is_primed(saved.saved_search_id):
+            raise RuntimeError("saved search must be primed before emitting alerts")
         occurred = occurred_at.isoformat()
         created: list[AlertEvent] = []
         with self._connection:
@@ -251,6 +295,15 @@ class SQLiteSavedSearchStore:
             )
             for row in rows
         )
+
+    def _search_row(self, saved_search_id: str) -> sqlite3.Row:
+        row = self._connection.execute(
+            "SELECT * FROM saved_searches WHERE saved_search_id = ?",
+            (saved_search_id,),
+        ).fetchone()
+        if row is None:
+            raise KeyError(saved_search_id)
+        return row
 
     @staticmethod
     def _serialize_query(query: SearchQuery) -> str:
@@ -328,6 +381,9 @@ class SavedSearchEvaluator:
         if not saved.enabled:
             return ()
         canonical_ids = self._all_matching_ids(saved.query, now=now)
+        if not self._store.is_primed(saved.saved_search_id):
+            self._store.establish_baseline(saved, canonical_ids, occurred_at=now)
+            return ()
         return self._store.mark_matches(saved, canonical_ids, occurred_at=now)
 
     def evaluate_all(self, *, now: datetime) -> tuple[AlertEvent, ...]:
