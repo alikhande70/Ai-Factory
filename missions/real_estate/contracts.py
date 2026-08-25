@@ -41,6 +41,8 @@ class ListingCandidate:
     image_hashes: tuple[str, ...]
     source_updated_at: datetime
     last_verified_at: datetime
+    latitude: float | None = None
+    longitude: float | None = None
     state: ListingState = ListingState.DRAFT
 
     def validate(self) -> None:
@@ -58,6 +60,12 @@ class ListingCandidate:
             raise ValueError("bedrooms must be non-negative")
         if self.last_verified_at < self.source_updated_at:
             raise ValueError("last_verified_at cannot predate source_updated_at")
+        if (self.latitude is None) != (self.longitude is None):
+            raise ValueError("latitude and longitude must be provided together")
+        if self.latitude is not None and not -90.0 <= self.latitude <= 90.0:
+            raise ValueError("latitude must be between -90 and 90")
+        if self.longitude is not None and not -180.0 <= self.longitude <= 180.0:
+            raise ValueError("longitude must be between -180 and 180")
 
 
 @dataclass(frozen=True)
