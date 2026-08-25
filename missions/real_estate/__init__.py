@@ -1,4 +1,5 @@
 from .contracts import ListingCandidate, ListingState, RightsBasis, SearchSignals
+from .geo import GeoHit, GeoPoint, SQLiteGeoIndex
 from .integrity import (
     FreshnessPolicy,
     completeness_score,
@@ -13,6 +14,8 @@ from .search import RealEstateSearchService, SearchPage, SearchQuery, SearchResu
 
 __all__ = [
     "FreshnessPolicy",
+    "GeoHit",
+    "GeoPoint",
     "InventoryQuery",
     "ListingCandidate",
     "ListingState",
@@ -20,6 +23,7 @@ __all__ = [
     "RankingDecision",
     "RealEstateSearchService",
     "RightsBasis",
+    "SQLiteGeoIndex",
     "SQLiteInventoryStore",
     "SearchPage",
     "SearchQuery",
