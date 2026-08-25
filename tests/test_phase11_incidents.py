@@ -28,10 +28,9 @@ class Phase11IncidentResponseTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             _, store = self._store(Path(tmp))
             self._declare(store)
-            for state in ("TRIAGED", "CONTAINING", "CONTAINED", "RECOVERING"):
+            for state in ("TRIAGED", "CONTAINING", "CONTAINED", "RECOVERING", "MONITORING"):
                 store.transition("INC-1", mission_id="MISSION-001", actor_id="A11", new_status=state)
             with self.assertRaisesRegex(RuntimeError, "incident_recovery_not_verified"):
-                store.transition("INC-1", mission_id="MISSION-001", actor_id="A11", new_status="MONITORING")
                 store.transition("INC-1", mission_id="MISSION-001", actor_id="A11", new_status="CLOSED")
 
             store.record_evidence(
@@ -48,7 +47,6 @@ class Phase11IncidentResponseTests(unittest.TestCase):
                 actor_id="A10",
                 evidence_id="EV-RECOVERY",
             )
-            store.transition("INC-1", mission_id="MISSION-001", actor_id="A11", new_status="MONITORING")
             closed = store.transition("INC-1", mission_id="MISSION-001", actor_id="A11", new_status="CLOSED")
             self.assertTrue(closed.recovery_verified)
             self.assertEqual(closed.status, "CLOSED")
