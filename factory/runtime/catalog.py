@@ -194,13 +194,34 @@ class SQLiteRuntimeCatalog:
             except sqlite3.IntegrityError as exc:
                 raise ValueError(f"duplicate proposal: {proposal_id}") from exc
 
-    def decide_action(self, proposal_id: str, *, approved: bool, decided_by: str) -> str:
+    def approval_record(self, proposal_id: str, *, mission_id: str | None = None) -> dict[str, Any]:
+        with self._connection() as connection:
+            row = connection.execute("SELECT * FROM approvals WHERE proposal_id=?", (proposal_id,)).fetchone()
+        if row is None:
+            raise KeyError(proposal_id)
+        if mission_id is not None and str(row["mission_id"]) != mission_id:
+            raise PermissionError("cross_mission_access_denied")
+        return dict(row)
+
+    def decide_action(
+        self,
+        proposal_id: str,
+        *,
+        approved: bool,
+        decided_by: str,
+        mission_id: str | None = None,
+    ) -> str:
         status = "APPROVED" if approved else "DENIED"
         with self._connection() as connection:
             connection.execute("BEGIN IMMEDIATE")
-            row = connection.execute("SELECT status FROM approvals WHERE proposal_id=?", (proposal_id,)).fetchone()
+            row = connection.execute(
+                "SELECT mission_id, status FROM approvals WHERE proposal_id=?",
+                (proposal_id,),
+            ).fetchone()
             if row is None:
                 raise KeyError(proposal_id)
+            if mission_id is not None and str(row["mission_id"]) != mission_id:
+                raise PermissionError("cross_mission_access_denied")
             if row["status"] != "PENDING":
                 raise RuntimeError("approval_already_decided")
             connection.execute(
@@ -209,9 +230,5 @@ class SQLiteRuntimeCatalog:
             )
         return status
 
-    def approval_status(self, proposal_id: str) -> str:
-        with self._connection() as connection:
-            row = connection.execute("SELECT status FROM approvals WHERE proposal_id=?", (proposal_id,)).fetchone()
-        if row is None:
-            raise KeyError(proposal_id)
-        return str(row["status"])
+    def approval_status(self, proposal_id: str, *, mission_id: str | None = None) -> str:
+        return str(self.approval_record(proposal_id, mission_id=mission_id)["status"])
