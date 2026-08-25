@@ -1,9 +1,9 @@
-# AI Factory — Master Roadmap v3
+# AI Factory — Master Roadmap v4
 
 > **Status:** Active build  
-> **Current phase:** Phase 3 — Design Pod  
+> **Current phase:** Phase 4 — Engineering Pod  
 > **Architecture:** Hybrid deterministic Control Plane + bounded AI workers  
-> **Next milestone:** Turn a raw product mission into a validated DesignBundle containing requirements, acceptance criteria, architecture decisions and UX flows, then prove cross-role consistency with executable tests.  
+> **Next milestone:** Define and execute typed engineering work packages for A05 Frontend, A06 Backend, A07 Database and A08 AI & Automation with isolated write scopes, dependency-aware integration and evidence-backed completion.  
 > **Repository purpose:** Build a reusable AI-native software organization that can turn product missions into verified software without requiring the human owner to manually coordinate every engineering role.
 
 ---
@@ -182,44 +182,51 @@ Qualified local runtime includes:
 - structured tracing with redaction
 - restart/resume reconciliation tests
 
-Exit evidence is recorded in `docs/evaluations/PHASE2_COMPLETION.md`. GitHub Actions passed on the qualified Phase 2 commit. Phase 2 establishes local transactional durability only; it does not claim distributed or production durability.
+Exit evidence is recorded in `docs/evaluations/PHASE2_COMPLETION.md`. Phase 2 establishes local transactional durability only; it does not claim distributed or production durability.
 
-## Phase 3 — Design Pod 🚧 CURRENT
+## Phase 3 — Design Pod ✅ PASS
 
-Implement and evaluate:
+Completed and qualified:
 - [x] A02 Product Architect contract
 - [x] A03 System Architect contract
 - [x] A04 UI/UX contract
 - [x] typed `DesignBundle` contracts
 - [x] `schemas/design-bundle.schema.json`
 - [x] deterministic cross-role `DesignBundleValidator`
-- [x] initial consistency tests
-- [ ] mission-to-product worker interface
-- [ ] product-to-architecture worker interface
-- [ ] product-to-UX worker interface
-- [ ] bounded Design Pod coordinator
-- [ ] persisted DesignBundle artifact handoff
-- [ ] raw-mission end-to-end design evaluation fixture
-- [ ] contradiction/ambiguity evaluation cases
+- [x] mission-to-product worker interface
+- [x] product-to-architecture worker interface
+- [x] product-to-UX worker interface
+- [x] bounded Design Pod coordinator
+- [x] persisted DesignBundle artifact handoff
+- [x] raw-mission end-to-end design evaluation fixture
+- [x] contradiction/ambiguity evaluation cases
+- [x] bounded role-targeted revision loop
+- [x] downstream regeneration after product revision
+- [x] no-progress and revision-exhaustion protection
 
-Required outputs:
-- product summary / PRD-level definition,
-- goals and non-goals,
-- prioritized requirements,
-- acceptance criteria with verification methods,
-- architecture decisions and data/API boundaries,
-- UX flows and accessibility constraints,
-- assumptions and risks.
+Exit evidence is recorded in `docs/evaluations/PHASE3_COMPLETION.md`. GitHub Actions passed on qualified commit `7d2a9e85ddfde4ad99a339b944864200be3ee662` (run `32814610369`).
 
-Exit criteria: a raw product idea becomes an internally consistent, traceable and build-ready DesignBundle before coding begins. Every MUST requirement has acceptance coverage and appropriate architecture/UX coverage; invalid cross-role references are rejected automatically.
+Exit criteria satisfied: a raw product idea becomes an internally consistent, traceable and build-ready DesignBundle before coding begins. Every MUST requirement has acceptance coverage and appropriate architecture/UX coverage; invalid cross-role references are rejected automatically.
 
-## Phase 4 — Engineering Pod
+## Phase 4 — Engineering Pod 🚧 CURRENT
 
-Implement and evaluate A05 Frontend, A06 Backend, A07 Database and A08 AI & Automation.
+Implement and evaluate:
+- [ ] A05 Frontend contract
+- [ ] A06 Backend contract
+- [ ] A07 Database contract
+- [ ] A08 AI & Automation contract
+- [ ] typed implementation work-package contract/schema
+- [ ] deterministic write-scope/dependency validator
+- [ ] isolated workspace/branch assignment model
+- [ ] evidence manifest for code/test/artifact completion
+- [ ] engineering coordinator with bounded retries/revisions
+- [ ] integration plan and conflict handling
+- [ ] DesignBundle → engineering work packages fixture
+- [ ] controlled-environment integrated application evaluation
 
-Requirements: isolated workspaces/branches, declared write scopes, test/evidence output, dependency review and no direct production credentials.
+Requirements: isolated workspaces/branches, declared write scopes, test/evidence output, dependency review, explicit artifact ownership and no direct production credentials.
 
-Exit criteria: Design Pod artifacts can produce an integrated working application in a controlled environment.
+Exit criteria: Design Pod artifacts can produce an integrated working application in a controlled environment, and no engineering work package can become complete without declared scope, traceability to DesignBundle requirements and executable evidence.
 
 ## Phase 5 — Assurance Pod
 
@@ -292,4 +299,4 @@ Before changing AI Factory:
 8. Do not bypass governance or approval boundaries.
 9. Update roadmap/status only when evidence genuinely changes.
 
-**Current next action:** implement the three Design Pod worker interfaces and a bounded coordinator that converts a raw mission into a persisted, validator-approved DesignBundle, then add end-to-end and contradiction evaluation fixtures.
+**Current next action:** define A05–A08 engineering agent contracts and the typed implementation work-package/evidence model, then enforce write-scope and DesignBundle traceability before adding any code-producing worker implementation.
