@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-factory.local/schemas/objection.schema.json",
+  "title": "ObjectionRecord",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["objection_id", "mission_id", "task_id", "raised_by", "severity", "reason"],
+  "properties": {
+    "objection_id": {"type": "string", "minLength": 1},
+    "mission_id": {"type": "string", "minLength": 1},
+    "task_id": {"type": "string", "minLength": 1},
+    "raised_by": {"type": "string", "minLength": 1},
+    "severity": {"enum": ["INFO", "WARNING", "BLOCKING"]},
+    "reason": {"type": "string", "minLength": 1}
+  }
+}
