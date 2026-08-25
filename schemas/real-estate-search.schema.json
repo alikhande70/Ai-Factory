@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-factory.local/schemas/real-estate-search.schema.json",
+  "title": "Mission 001 Real Estate Search Query",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "text": {"type": "string", "default": ""},
+    "transaction_type": {"type": ["string", "null"]},
+    "property_type": {"type": ["string", "null"]},
+    "city": {"type": ["string", "null"]},
+    "locality": {"type": ["string", "null"]},
+    "geo_cell_prefix": {"type": ["string", "null"], "minLength": 1},
+    "center_latitude": {"type": ["number", "null"], "minimum": -90, "maximum": 90},
+    "center_longitude": {"type": ["number", "null"], "minimum": -180, "maximum": 180},
+    "radius_km": {"type": ["number", "null"], "exclusiveMinimum": 0},
+    "min_price_minor": {"type": ["integer", "null"], "minimum": 0},
+    "max_price_minor": {"type": ["integer", "null"], "minimum": 0},
+    "bedrooms": {"type": ["integer", "null"], "minimum": 0},
+    "states": {
+      "type": "array",
+      "items": {"enum": ["ACTIVE", "UNDER_OFFER", "SOLD", "RENTED", "WITHDRAWN", "EXPIRED", "DRAFT"]},
+      "uniqueItems": true,
+      "default": ["ACTIVE", "UNDER_OFFER"]
+    },
+    "page_size": {"type": "integer", "minimum": 1, "maximum": 100, "default": 20},
+    "cursor": {"type": ["string", "null"], "minLength": 1}
+  },
+  "allOf": [
+    {
+      "if": {
+        "anyOf": [
+          {"required": ["center_latitude"]},
+          {"required": ["center_longitude"]},
+          {"required": ["radius_km"]}
+        ]
+      },
+      "then": {"required": ["center_latitude", "center_longitude", "radius_km"]}
+    }
+  ]
+}
