@@ -24,7 +24,11 @@ GitHub Actions run `32819238119` passed after fixing a backward-compatibility re
 
 The regression was real: the first workspace allocator normalized the runtime `workspace_id`, but an existing Engineering Pod contract and test expected the canonical `MISSION_ID:PACKAGE_ID` identity. The fix preserves canonical identity for runtime addressing while independently slugging the branch name. The corrected suite passed.
 
-The subsequent integration test suite also passed in GitHub Actions job `97714045931` on commit `abb3b79fb23bcaa5e077d0c340296189674e286c`.
+The subsequent integration validator test suite passed in GitHub Actions job `97714045931` on commit `abb3b79fb23bcaa5e077d0c340296189674e286c`.
+
+Coordinator commit `8befad3fe076d18de224fc2c364ca20c0cbabd3d` also passed GitHub Actions run `32819456984`. It connects validated package execution to a canonical `IntegrationManifest` and persists that manifest through the runtime Artifact Registry.
+
+A newer end-to-end persistence test exists on commit `e9a66efb3078b7ed4d5f42b1300a89b347b8ba4d`; final CI qualification for that exact head is intentionally not claimed here until a workflow result is observed.
 
 ## Important guarantees now enforced
 
@@ -37,12 +41,13 @@ The subsequent integration test suite also passed in GitHub Actions job `9771404
 7. Two packages cannot ambiguously claim the same produced artifact.
 8. Two packages cannot both claim the same changed path in one integration manifest.
 9. AI/automation workers remain subordinate to deterministic policy/state validation and human approval boundaries.
+10. The Engineering Pod can persist an integration manifest only after all package evidence passes deterministic validation.
 
 ## Remaining Phase 4 work
 
 Phase 4 is not complete yet. Remaining exit work:
 
-- connect the Engineering Pod coordinator directly to the integration manifest and persist the integrated result,
+- qualify the end-to-end coordinator integration persistence test on the current head,
 - add an explicit DesignBundle -> engineering-plan reference fixture,
 - add a controlled-environment working application fixture that exercises at least frontend/backend/database boundaries (and AI only when the fixture needs it),
 - verify integrated application behavior with executable tests rather than artifact claims,
