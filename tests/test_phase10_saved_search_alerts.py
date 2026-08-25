@@ -185,6 +185,28 @@ class SavedSearchAlertTests(unittest.TestCase):
         self.assertEqual(events[0].canonical_id, canonical_id)
         self.assertEqual(events[0].saved_search_version, edited.version)
 
+    def test_evaluator_follows_all_search_pages(self) -> None:
+        saved = self._save_berlin()
+        # Empty initial inventory establishes an empty baseline.
+        self.assertEqual(self.evaluator.evaluate(saved.saved_search_id, now=NOW), ())
+        expected: set[str] = set()
+        for idx in range(105):
+            expected.add(
+                self.inventory.add_source(
+                    candidate(
+                        f"PAGE-{idx:03d}",
+                        geo_cell=f"CELL-PAGE-{idx:03d}",
+                        image_hash=f"page-image-{idx:03d}",
+                    )
+                )
+            )
+
+        events = self.evaluator.evaluate(saved.saved_search_id, now=NOW + timedelta(minutes=1))
+        self.assertEqual(len(events), 105)
+        self.assertEqual({event.canonical_id for event in events}, expected)
+        self.assertEqual(len(self.alerts.outbox()), 105)
+        self.assertEqual(self.evaluator.evaluate(saved.saved_search_id, now=NOW + timedelta(minutes=2)), ())
+
     def test_disabled_search_does_not_prime_or_emit(self) -> None:
         saved = self.alerts.save(
             SavedSearch(
