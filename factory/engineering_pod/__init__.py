@@ -17,6 +17,7 @@ from .workers import (
     RevisableEngineeringPlannerWorker,
     RevisableEngineeringWorker,
 )
+from .workspace import WorkspaceAllocator, WorkspaceAssignment
 
 __all__ = [
     "DISCIPLINE_OWNER",
@@ -33,4 +34,6 @@ __all__ = [
     "RevisableEngineeringPlannerWorker",
     "RevisableEngineeringWorker",
     "EngineeringPodCoordinator",
+    "WorkspaceAllocator",
+    "WorkspaceAssignment",
 ]
