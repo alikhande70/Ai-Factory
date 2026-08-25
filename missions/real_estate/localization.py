@@ -60,6 +60,7 @@ class LocalizedConsumerListing:
     title: str
     location_text: str
     price_text: str
+    currency_code: str
     area_text: str
     bedrooms_text: str
     last_verified_text: str
@@ -112,7 +113,12 @@ _MESSAGES: dict[str, dict[str, str]] = {
 
 
 class RealEstateMarketAdapter:
-    """Formats qualified projections without changing domain semantics."""
+    """Formats qualified projections without changing domain semantics.
+
+    Currency conversion is deliberately outside this adapter. A caller must provide
+    the canonical currency for an amount. If it differs from the locale context's
+    display currency, localization fails closed instead of relabelling the number.
+    """
 
     def __init__(self, context: LocaleContext) -> None:
         context.validate()
@@ -141,17 +147,22 @@ class RealEstateMarketAdapter:
             return rendered.translate(_PERSIAN_DIGITS).replace(",", "٬").replace(".", "٫")
         return rendered
 
-    def format_amount(self, minor_value: int) -> str:
+    def format_amount(self, minor_value: int, *, currency_code: str) -> str:
         if minor_value < 0:
             raise ValueError("amount cannot be negative")
+        if currency_code not in _SUPPORTED_CURRENCIES:
+            raise ValueError("currency_code must be explicit and supported")
+        if currency_code != self.context.currency_code:
+            raise ValueError(
+                "currency conversion is not a localization concern; canonical and display currency must match"
+            )
         number = self.format_integer(minor_value)
-        currency = self.context.currency_code
         if self.context.locale == "fa-IR":
             labels = {"IRR": "ریال", "EUR": "یورو", "USD": "دلار آمریکا"}
-            return f"{number} {labels[currency]}"
+            return f"{number} {labels[currency_code]}"
         symbols = {"IRR": "IRR", "EUR": "€", "USD": "$"}
-        symbol = symbols[currency]
-        return f"{symbol}{number}" if currency in {"EUR", "USD"} else f"{number} {symbol}"
+        symbol = symbols[currency_code]
+        return f"{symbol}{number}" if currency_code in {"EUR", "USD"} else f"{number} {symbol}"
 
     def format_datetime(self, value: datetime) -> str:
         if value.tzinfo is None:
@@ -166,6 +177,7 @@ class RealEstateMarketAdapter:
         self,
         projection: ConsumerListingProjection,
         *,
+        canonical_currency_code: str,
         canonical_url: str | None = None,
     ) -> LocalizedConsumerListing:
         verified = datetime.fromisoformat(projection.last_verified_at)
@@ -185,7 +197,8 @@ class RealEstateMarketAdapter:
             direction=self.context.direction,
             title=projection.title,
             location_text=location,
-            price_text=self.format_amount(projection.price_minor),
+            price_text=self.format_amount(projection.price_minor, currency_code=canonical_currency_code),
+            currency_code=canonical_currency_code,
             area_text=area,
             bedrooms_text=bedrooms,
             last_verified_text=self.format_datetime(verified),
@@ -197,7 +210,7 @@ class RealEstateMarketAdapter:
         )
 
     def localize_discovery_document(self, document: DiscoveryDocument) -> LocalizedDiscoveryDocument:
-        """Localize the display shell while copying SEO authority fields verbatim.
+        """Localize display metadata while copying SEO authority fields verbatim.
 
         Translation is deliberately not fabricated. Until a reviewed translation
         artifact exists, title/description remain the qualified canonical text.
