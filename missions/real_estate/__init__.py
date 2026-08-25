@@ -1,3 +1,4 @@
+from .alerts import AlertEvent, SavedSearch, SavedSearchEvaluator, SQLiteSavedSearchStore
 from .contracts import ListingCandidate, ListingState, RightsBasis, SearchSignals
 from .geo import GeoHit, GeoPoint, SQLiteGeoIndex
 from .integrity import (
@@ -13,6 +14,7 @@ from .ranking import RankingDecision, rank_listing
 from .search import RealEstateSearchService, SearchPage, SearchQuery, SearchResult
 
 __all__ = [
+    "AlertEvent",
     "FreshnessPolicy",
     "GeoHit",
     "GeoPoint",
@@ -25,6 +27,9 @@ __all__ = [
     "RightsBasis",
     "SQLiteGeoIndex",
     "SQLiteInventoryStore",
+    "SQLiteSavedSearchStore",
+    "SavedSearch",
+    "SavedSearchEvaluator",
     "SearchPage",
     "SearchQuery",
     "SearchResult",
