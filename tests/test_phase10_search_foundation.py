@@ -86,7 +86,6 @@ class SearchFoundationTests(unittest.TestCase):
         self.assertEqual([r.geo_cell for r in page.results], ["DE-BE-001-A"])
 
     def test_duplicate_sources_collapse_to_one_search_result(self) -> None:
-        # Same physical-opportunity fingerprint, distinct source and publisher.
         first = candidate("L1", source_ref="partner-a:1", publisher_id="PUB-A", image_hash="shared-image")
         second = candidate("L2", source_ref="partner-b:77", publisher_id="PUB-B", image_hash="shared-image")
         self.assertEqual(self.store.add_source(first), self.store.add_source(second))
@@ -117,6 +116,30 @@ class SearchFoundationTests(unittest.TestCase):
         self.assertEqual(len(ids), 5)
         self.assertEqual(len(set(ids)), 5)
         self.assertIsNone(third.next_cursor)
+
+    def test_equal_score_and_equal_time_use_stable_canonical_tie_breaker(self) -> None:
+        for idx in range(6):
+            self.store.add_source(
+                candidate(
+                    f"TIE-{idx}",
+                    geo_cell=f"DE-BE-TIE-{idx}",
+                    verified_days_ago=1,
+                    image_hash=f"tie-{idx}",
+                )
+            )
+
+        all_ids: list[str] = []
+        cursor = None
+        while True:
+            page = self.search.search(SearchQuery(city="Berlin", page_size=2, cursor=cursor), now=NOW)
+            all_ids.extend(result.canonical_id for result in page.results)
+            if page.next_cursor is None:
+                break
+            cursor = page.next_cursor
+
+        self.assertEqual(len(all_ids), 6)
+        self.assertEqual(len(set(all_ids)), 6)
+        self.assertEqual(all_ids, sorted(all_ids))
 
     def test_cursor_is_bound_to_query(self) -> None:
         for idx in range(3):
