@@ -12,6 +12,12 @@ from .contracts import (
 )
 from .controller import DurableOperationController
 from .engine import ReliabilityDecisionEngine
+from .recovery import (
+    MissionRecoveryCoordinator,
+    MissionRecoveryItem,
+    MissionRecoveryReport,
+    ReleasePreviewPlan,
+)
 from .store import SQLiteReliabilityStore
 
 __all__ = [
@@ -25,5 +31,9 @@ __all__ = [
     "ReliabilityMetric",
     "DurableOperationController",
     "ReliabilityDecisionEngine",
+    "MissionRecoveryCoordinator",
+    "MissionRecoveryItem",
+    "MissionRecoveryReport",
+    "ReleasePreviewPlan",
     "SQLiteReliabilityStore",
 ]
