@@ -1,4 +1,4 @@
-"""Engineering Pod contracts and deterministic validation."""
+"""Engineering Pod contracts, workers, coordinator and deterministic validation."""
 
 from .contracts import (
     DISCIPLINE_OWNER,
@@ -7,7 +7,16 @@ from .contracts import (
     ImplementationWorkPackage,
     VerificationResult,
 )
+from .coordinator import EngineeringPodCoordinator
 from .validator import EngineeringFinding, EngineeringPlanValidator
+from .workers import (
+    EngineeringPlan,
+    EngineeringPlannerWorker,
+    EngineeringRevisionRequest,
+    EngineeringWorker,
+    RevisableEngineeringPlannerWorker,
+    RevisableEngineeringWorker,
+)
 
 __all__ = [
     "DISCIPLINE_OWNER",
@@ -17,4 +26,11 @@ __all__ = [
     "VerificationResult",
     "EngineeringFinding",
     "EngineeringPlanValidator",
+    "EngineeringPlan",
+    "EngineeringPlannerWorker",
+    "EngineeringRevisionRequest",
+    "EngineeringWorker",
+    "RevisableEngineeringPlannerWorker",
+    "RevisableEngineeringWorker",
+    "EngineeringPodCoordinator",
 ]
