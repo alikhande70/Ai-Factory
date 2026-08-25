@@ -8,9 +8,11 @@ from .contracts import (
     ExternalResult,
     ExternalTaskRequest,
 )
+from .gateway import BoundedInteroperabilityGateway
 from .mcp import MCPAdapter, SUPPORTED_MCP_VERSION
 from .policy import InteropPolicyDecision, InteropPolicyGuard
 from .reliability import InteropReliabilityBridge
+from .transport import InMemoryInteropTransport, InteropTransport
 
 __all__ = [
     "A2AAdapter",
@@ -20,9 +22,12 @@ __all__ = [
     "ExternalProvenance",
     "ExternalResult",
     "ExternalTaskRequest",
+    "BoundedInteroperabilityGateway",
     "MCPAdapter",
     "SUPPORTED_MCP_VERSION",
     "InteropPolicyDecision",
     "InteropPolicyGuard",
     "InteropReliabilityBridge",
+    "InMemoryInteropTransport",
+    "InteropTransport",
 ]
