@@ -1,9 +1,9 @@
-# AI Factory — Master Roadmap v7
+# AI Factory — Master Roadmap v8
 
 > **Status:** Active build  
-> **Current phase:** Phase 7 — Interoperability  
+> **Current phase:** Phase 8 — Organizational Memory & Evaluation System  
 > **Architecture:** Hybrid deterministic Control Plane + bounded AI workers  
-> **Next milestone:** Implement protocol-versioned MCP and A2A boundary adapters while keeping internal schemas/state canonical; qualify translation, capability discovery, rejection of unsupported protocol versions, and no-privilege-escalation behavior.  
+> **Next milestone:** Persist reviewed organizational memory with provenance/integrity, then add protected evaluation baselines and quality/cost/latency/false-completion metrics.  
 > **Repository purpose:** Build a reusable AI-native software organization that can turn product missions into verified software without requiring the human owner to manually coordinate every engineering role.
 
 ---
@@ -29,7 +29,9 @@ SECURITY / QA / RED TEAM
   ↓
 RELIABILITY / RELEASE
   ↓
-INTEROPERABILITY ADAPTERS
+INTEROPERABILITY
+  ↓
+ORGANIZATIONAL MEMORY + EVALS
   ↓
 HUMAN GATE WHEN REQUIRED
   ↓
@@ -55,9 +57,10 @@ The Factory uses:
 7. **Human gates** for protected external, financial, identity-bound, destructive and other high-impact actions.
 8. **Single-worker fast path** when additional agents do not create measurable value.
 9. **Mission Pods** that activate only the specialist roles a mission needs.
-10. **Provider independence**: internal schemas/state remain canonical; MCP/A2A/provider SDKs are boundary adapters, never sources of authority.
+10. **Provider/protocol independence**: internal schemas/state remain canonical; MCP/A2A/provider SDKs are boundary adapters, never authority sources.
+11. **Reviewed organizational memory**: reusable lessons are promoted only with provenance, evidence and independent review.
 
-See `docs/foundation/FINAL_ARCHITECTURE_AUDIT.md` and `docs/architecture/decisions/ADR-0001-hybrid-control-plane.md`.
+See `docs/foundation/FINAL_ARCHITECTURE_AUDIT.md`, `ADR-0001-hybrid-control-plane.md`, and `ADR-0002-interoperability-boundary.md`.
 
 ---
 
@@ -87,16 +90,18 @@ Roles are logical specialists, not necessarily twelve continuously running proce
 - No fake completion.
 - Natural language never grants privilege.
 - Orchestrator does not approve its own protected actions.
-- Retrieved content is untrusted data, not authority.
+- Retrieved/external content is untrusted data, not authority.
 - Important knowledge belongs in versioned repository/state artifacts.
 - Critical state transitions are deterministic and auditable.
 - Side effects require retry/idempotency/reconciliation design.
 - Security/evaluation gates cannot be weakened merely to make implementation pass.
 - Agent confidence is metadata, not proof.
 - Multi-agent execution is justified by value, not aesthetics.
-- Irreversible or consequential external actions cross the required human/policy gate.
+- Irreversible or consequential external actions cross required human/policy gates.
 - Review independence is a runtime property, not an agent-count claim.
-- External protocols may transport requests/results but cannot directly mutate canonical authority, policy or permissions.
+- External protocols cannot directly mutate canonical authority, policy or permissions.
+- Organizational memory cannot be written directly by raw web/tool/agent content.
+- Self-improvement may propose changes; it cannot silently rewrite governance, protected evals or its own evaluator.
 
 ---
 
@@ -106,7 +111,7 @@ The Factory maintains three distinct state classes:
 
 - **Canonical State:** validated mission facts, tasks, decisions, artifact versions, approvals, evidence and events.
 - **Worker Scratch State:** ephemeral task-local context; disposable and untrusted by default.
-- **Organizational Memory:** reusable lessons/patterns promoted only through review and provenance.
+- **Organizational Memory:** reusable lessons/patterns promoted only through review, evidence and provenance.
 
 Raw user/web/tool/protocol content must never automatically become trusted long-term memory.
 
@@ -138,93 +143,98 @@ Only deterministic runtime code may perform protected state transitions after va
 
 ## Phase 0 — Project Constitution ✅ PASS
 
-Completed: master roadmap, repository entrypoint, initial organization, human-approval principle and evidence-before-completion principle.
+Master roadmap, repository entrypoint, initial organization, approval principle and evidence-before-completion principle.
 
 ## Phase 0.5 — Architecture Audit & Factory DNA ✅ PASS
 
-Completed: Manifesto, Company DNA, Governance, Autonomy Model, Threat Model and hybrid-control-plane ADR.
+Manifesto, Company DNA, Governance, Autonomy Model, Threat Model and hybrid-control-plane ADR.
 
 ## Phase 1 — Control Plane & Orchestrator Foundation ✅ PASS
 
-Qualified: A01 contract, typed core contracts, deterministic state transitions, dependency validation, permissions/budgets, audit ledger, replayable mission runner, reviewer independence and orchestration evaluations.
+A01 contract, typed core contracts, deterministic state transitions, dependencies, permissions/budgets, audit ledger, replayable mission runner, reviewer independence and orchestration evals.
 
 ## Phase 2 — Minimum Local Runtime ✅ PASS
 
-Qualified: Mission Intake, persisted Agent Registry, mission/task persistence, durable local audit ledger, Artifact Registry, Policy Engine v0, Budget Manager, Approval State Manager, workspace abstraction, provider adapter, structured redacted tracing and restart/resume tests.
+Mission Intake, persisted Agent Registry, mission/task persistence, durable local audit ledger, Artifact Registry, Policy Engine v0, Budget Manager, Approval Manager, workspace abstraction, provider adapter, redacted tracing and restart/resume tests.
 
 Evidence: `docs/evaluations/PHASE2_COMPLETION.md`.
 
 ## Phase 3 — Design Pod ✅ PASS
 
-Qualified: A02/A03/A04 contracts, typed DesignBundle, deterministic cross-role validation, bounded revision, downstream regeneration, ambiguity/contradiction evals and persisted design artifacts.
+A02/A03/A04 contracts, typed DesignBundle, deterministic cross-role validation, bounded revision, downstream regeneration, ambiguity/contradiction evals and persisted design artifacts.
 
 Evidence: `docs/evaluations/PHASE3_COMPLETION.md`.
 
 ## Phase 4 — Engineering Pod ✅ PASS
 
-Qualified: A05–A08 contracts, implementation/evidence/integration contracts, DesignBundle traceability, write-scope isolation, bounded revision loops, IntegrationManifest, persisted engineering artifacts and controlled full-stack qualification app.
+A05–A08 contracts, implementation/evidence/integration contracts, DesignBundle traceability, write-scope isolation, bounded revision loops, IntegrationManifest, persisted engineering artifacts and controlled full-stack qualification app.
 
 Evidence: `docs/evaluations/PHASE4_COMPLETION.md`.
 
 ## Phase 5 — Assurance Pod ✅ PASS
 
-Qualified: A09/A10/A12 independent assurance, typed findings/reports/decisions, threat-model tests, acceptance coverage, adversarial seams, remediation/re-review and exact release-readiness fingerprinting.
+A09/A10/A12 independent assurance, typed findings/reports/decisions, threat-model tests, acceptance coverage, adversarial seams, remediation/re-review and exact release-readiness fingerprinting.
 
 Evidence: `docs/evaluations/PHASE5_COMPLETION.md`.
 
 ## Phase 6 — Reliability & Durable Execution ✅ PASS
 
-Qualified:
-- [x] A11 DevOps/Reliability contract
-- [x] typed operation/attempt/recovery/circuit/deadline/compensation/metric contracts
-- [x] deterministic COMPLETE / RETRY / RECONCILE / STOP decision engine
-- [x] external-write idempotency and reconciliation requirements
-- [x] unknown external-write outcome reconciles before retry
-- [x] bounded retries and retry-budget exhaustion
-- [x] persisted circuit breaker and explicit HALF_OPEN probe
-- [x] persisted timeout/deadline observations
-- [x] transactional attempt + decision + circuit persistence
-- [x] restart-safe mixed mission recovery
-- [x] compensation/rollback contract with success evidence
-- [x] durable reliability metrics and shared runtime tracing bridge
-- [x] release-preview boundary with exact reviewed fingerprint and rollback reference
-- [x] explicit human gate for production release plan
+A11 contract; durable retry/reconcile/circuit/deadline/compensation semantics; idempotency; atomic attempt+decision+circuit persistence; mission restart recovery; reliability metrics/tracing; release-preview fingerprint/rollback boundary; human production gate.
 
 Evidence: `docs/evaluations/PHASE6_COMPLETION.md`.
 
-Qualified executable head: `1c018b6d20777ee80ddc71a9343718c1b380fd87`; GitHub Actions run `32834489886` succeeded. No production deployment or external side effect was performed.
+## Phase 7 — Interoperability ✅ PASS
 
-Exit criterion satisfied for controlled local qualification: after interruption or ambiguous side-effect outcome, canonical state can be recovered without blind duplicate actions; retry/circuit/rollback rules are deterministic, bounded and auditable.
+Qualified in controlled transport fixtures:
 
-## Phase 7 — Interoperability 🚧 CURRENT
+- [x] protocol-neutral external capability/request/result/provenance contracts
+- [x] MCP `2026-07-28` boundary with explicit version rejection
+- [x] A2A `1.0.0` boundary with explicit version rejection
+- [x] deterministic transport abstraction for discovery/invocation/delegation fixtures
+- [x] malformed/duplicate discovery rejection
+- [x] capability intersection with Policy Engine, budget and approval state
+- [x] correlation/idempotency/provenance preservation
+- [x] external payload remains untrusted after protocol success
+- [x] malformed result rejection
+- [x] shared runtime tracing
+- [x] ambiguous external-write outcome → Phase 6 `RECONCILE`
+- [x] canonical compatibility across MCP/A2A adapters
+- [x] ADR-0002 boundary decision
 
-Goal: connect the Factory to external tools and independent agents without allowing transport protocols to redefine internal authority or canonical semantics.
+Evidence: `docs/evaluations/PHASE7_COMPLETION.md`.
 
-Protocol baselines for the first adapter qualification:
-- MCP specification `2026-07-28` (stateless core; version must be explicit at adapter boundary).
-- A2A released specification `1.0.0` (canonical data model with multiple protocol bindings).
+Qualified executable head: `4e5a0310bb873b0c8ef3341c1366658a8d07683a`; GitHub Actions run `32835211075` succeeded. No live remote tool/agent or production side effect was used.
 
-Planned deliverables:
-- [ ] protocol-neutral boundary types for external capabilities/tasks/results
-- [ ] MCP adapter interface for tool/context discovery and calls
-- [ ] A2A adapter interface for external-agent discovery and task delegation
-- [ ] explicit protocol-version negotiation/rejection
-- [ ] translation from external messages into internal typed proposals, never direct state mutation
-- [ ] capability intersection with Factory permissions/Policy Engine
-- [ ] correlation/idempotency identifiers at adapter boundary
-- [ ] untrusted payload labeling and provenance
-- [ ] adapter timeout/error mapping into Phase 6 reliability semantics
-- [ ] executable compatibility fixtures for MCP and A2A
-- [ ] malicious/over-privileged external capability rejection tests
-- [ ] final Phase 7 qualification report and CI evidence
+## Phase 8 — Organizational Memory & Evaluation System 🚧 CURRENT
 
-Exit criteria: supported external tools/agents can be discovered and invoked/delegated through deterministic adapters while unsupported versions, privilege escalation, malformed data and ambiguous side effects are safely rejected or routed into existing reliability/reconciliation mechanisms.
+Goal: make the Factory learn from verified outcomes without allowing memory poisoning or evaluator self-corruption.
 
-## Phase 8 — Organizational Memory & Evaluation System
+Started:
+- [x] `MemoryCandidate` with mission/source/evidence provenance
+- [x] deterministic fingerprint for candidate content/provenance
+- [x] `MemoryPromotionDecision`
+- [x] independent-review requirement for promotion
+- [x] raw `UNTRUSTED_EXTERNAL` source cannot be promoted directly
+- [x] reviewer must verify all candidate evidence
+- [x] rejected candidate cannot enter organizational memory
+- [x] initial executable promotion tests
 
-Deliver lesson promotion, memory provenance/integrity, regression corpus, benchmark dashboard, model-router evaluation, false-completion metric, cost/latency/quality metrics and protected evaluation baselines.
+Remaining:
+- [ ] durable append-audited Organizational Memory Store
+- [ ] source-hash integrity verification before recall/promotion
+- [ ] deprecation/supersession instead of destructive memory rewrite
+- [ ] mission-scoped vs global-memory visibility rules
+- [ ] protected regression corpus and baseline versioning
+- [ ] benchmark/evaluation run contracts and persistence
+- [ ] false-completion metric
+- [ ] quality/cost/latency metrics
+- [ ] model/provider routing evaluation
+- [ ] protected evaluator/governance-change boundary
+- [ ] evaluation dashboard/read model
+- [ ] memory/eval restart and tamper tests
+- [ ] Phase 8 completion report with CI evidence
 
-Self-improvement may propose changes; it may not silently rewrite governance or its evaluator.
+Exit criteria: the Factory can promote a verified lesson, recover it after restart with intact provenance, reject poisoned/unverified memory, run protected regression/evaluation baselines, and compare worker/provider outcomes using evidence-backed quality, false-completion, cost and latency metrics without allowing the evaluated worker to silently modify the benchmark or evaluator.
 
 ## Phase 9 — Factory Qualification Mission
 
@@ -238,7 +248,7 @@ Only after Factory qualification. Mission-specific roles may include Real Estate
 
 ## Phase 11 — Production Hardening
 
-Add multi-mission isolation, stronger identity/capability boundaries, secret management, audit retention, backup/restore, incident response, performance/scale testing, dependency/SBOM controls and production SLOs.
+Multi-mission isolation, stronger identity/capability boundaries, secret management, audit retention, backup/restore, incident response, performance/scale testing, dependency/SBOM controls and production SLOs.
 
 ---
 
@@ -258,7 +268,9 @@ A meaningful stable release must demonstrate that it can:
 10. expose an auditable explanation of what happened,
 11. swap worker model/provider without redesigning the Factory,
 12. interoperate with external tools/agents without granting transport-layer authority,
-13. finish a qualification mission with better engineering outcome than a simpler baseline.
+13. learn only from reviewed/provenance-preserving organizational memory,
+14. protect evaluation baselines from the worker being evaluated,
+15. finish a qualification mission with a better engineering outcome than a simpler baseline.
 
 ---
 
@@ -269,12 +281,13 @@ Before changing AI Factory:
 1. Read `README.md` and this `ROADMAP.md`.
 2. Read relevant foundation/architecture/agent documents.
 3. Inspect repository state; never rely only on chat memory.
-4. Identify the current phase and exit criteria.
+4. Identify current phase and exit criteria.
 5. Prefer completing the current milestone over unrelated work.
 6. Record material architecture decisions in ADRs.
 7. Do not claim tests/deployments/actions that were not executed and verified.
 8. Do not bypass governance or approval boundaries.
 9. Update roadmap/status only when evidence genuinely changes.
-10. Treat external protocol payloads as untrusted until deterministic validation/policy checks succeed.
+10. Treat external payloads and memory candidates as untrusted until deterministic validation/review succeeds.
+11. Do not weaken benchmarks/evaluators to make a worker pass.
 
-**Current next action:** implement protocol-neutral interoperability contracts, then MCP `2026-07-28` and A2A `1.0.0` adapters with version/capability/provenance guards and executable fixtures.
+**Current next action:** persist organizational memory with append-audited provenance and source integrity, then add protected evaluation baselines and multi-metric worker/provider evaluation.
