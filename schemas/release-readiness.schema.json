@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-factory.local/schemas/release-readiness.schema.json",
+  "title": "AI Factory Release Readiness Report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["stage","code_qualified","production_ready","controls","blockers"],
+  "properties": {
+    "stage": {"enum": ["NOT_QUALIFIED","CODE_QUALIFIED","PRODUCTION_READY"]},
+    "code_qualified": {"type": "boolean"},
+    "production_ready": {"type": "boolean"},
+    "controls": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["control_id","status","evidence_ref"],
+        "properties": {
+          "control_id": {"type": "string", "minLength": 1},
+          "status": {"enum": ["PASS","FAIL","UNVERIFIED","NOT_APPLICABLE"]},
+          "evidence_ref": {"type": ["string","null"]}
+        }
+      }
+    },
+    "blockers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["control_id","status","scope"],
+        "properties": {
+          "control_id": {"type": "string", "minLength": 1},
+          "status": {"type": "string", "minLength": 1},
+          "scope": {"enum": ["CODE","PRODUCTION"]}
+        }
+      }
+    }
+  }
+}
