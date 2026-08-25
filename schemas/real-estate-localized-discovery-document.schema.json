@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-factory.local/schemas/real-estate-localized-discovery-document.schema.json",
+  "title": "Real Estate Localized Discovery Document",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "canonical_id",
+    "locale",
+    "direction",
+    "canonical_url",
+    "route_path",
+    "indexable",
+    "robots_directive",
+    "noindex_reasons",
+    "title",
+    "description",
+    "lastmod",
+    "structured_data_profile",
+    "structured_data"
+  ],
+  "properties": {
+    "canonical_id": {"type": "string", "minLength": 1},
+    "locale": {"enum": ["fa-IR", "en-US"]},
+    "direction": {"enum": ["RTL", "LTR"]},
+    "canonical_url": {"type": "string", "minLength": 1},
+    "route_path": {"type": "string", "minLength": 1},
+    "indexable": {"type": "boolean"},
+    "robots_directive": {"type": "string", "minLength": 1},
+    "noindex_reasons": {"type": "array", "items": {"type": "string"}},
+    "title": {"type": "string"},
+    "description": {"type": "string"},
+    "lastmod": {"type": "string"},
+    "structured_data_profile": {"type": "string", "minLength": 1},
+    "structured_data": {"type": "object"}
+  }
+}
