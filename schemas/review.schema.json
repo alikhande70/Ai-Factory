@@ -1,0 +1,5 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://aifactory.local/schemas/review.schema.json","title":"Review","type":"object","additionalProperties":false,
+  "required":["review_id","target_id","reviewer_agent","verdict","findings","evidence_ids","independence"],
+  "properties":{"review_id":{"type":"string","pattern":"^REV-[A-Z0-9_-]+$"},"target_id":{"type":"string"},"reviewer_agent":{"type":"string"},"verdict":{"enum":["APPROVE","CHANGES_REQUESTED","BLOCK"]},"findings":{"type":"array","items":{"type":"object","additionalProperties":false,"required":["severity","message"],"properties":{"severity":{"enum":["INFO","LOW","MEDIUM","HIGH","CRITICAL"]},"message":{"type":"string","minLength":1}}}},"evidence_ids":{"type":"array","items":{"type":"string"}},"independence":{"enum":["CONTEXT_ISOLATED","CONFIG_ISOLATED","PROVIDER_DIVERSE","DETERMINISTIC"]}}
+}

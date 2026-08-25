@@ -1,0 +1,5 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://aifactory.local/schemas/agent.schema.json","title":"Agent","type":"object","additionalProperties":false,
+  "required":["agent_id","role","capabilities","read_scopes","write_scopes","enabled","review_independence"],
+  "properties":{"agent_id":{"type":"string","pattern":"^A[0-9]{2}(?:-[A-Z0-9_-]+)?$"},"role":{"type":"string","minLength":1},"capabilities":{"type":"array","uniqueItems":true,"items":{"type":"string","minLength":1}},"read_scopes":{"type":"array","uniqueItems":true,"items":{"type":"string"}},"write_scopes":{"type":"array","uniqueItems":true,"items":{"type":"string"}},"enabled":{"type":"boolean"},"review_independence":{"enum":["NONE","CONTEXT_ISOLATED","CONFIG_ISOLATED","PROVIDER_DIVERSE","DETERMINISTIC"]}}
+}

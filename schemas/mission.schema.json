@@ -1,0 +1,9 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://aifactory.local/schemas/mission.schema.json",
+  "title":"Mission",
+  "type":"object","additionalProperties":false,
+  "required":["mission_id","objective","quality_profile","constraints","non_goals","budget"],
+  "properties":{"mission_id":{"type":"string","pattern":"^MISSION-[A-Z0-9_-]+$"},"objective":{"type":"string","minLength":1},"quality_profile":{"enum":["PROTOTYPE","MVP","PRODUCTION","CRITICAL"]},"constraints":{"type":"array","items":{"type":"string"}},"known_context":{"type":"array","items":{"type":"string"},"default":[]},"non_goals":{"type":"array","items":{"type":"string"}},"budget":{"$ref":"#/$defs/budget"}},
+  "$defs":{"budget":{"type":"object","additionalProperties":false,"required":["max_tokens","max_tool_calls","max_retries","max_parallel_tasks"],"properties":{"max_tokens":{"type":"integer","minimum":0},"max_tool_calls":{"type":"integer","minimum":0},"max_retries":{"type":"integer","minimum":0},"max_parallel_tasks":{"type":"integer","minimum":1}}}}
+}
