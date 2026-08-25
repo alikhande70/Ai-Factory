@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-factory.local/schemas/assurance-decision.schema.json",
+  "title": "AssuranceDecision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["mission_id", "status", "reviewer_agents", "blocking_finding_ids", "report_ids"],
+  "properties": {
+    "mission_id": {"type": "string", "minLength": 1},
+    "status": {"enum": ["PASS", "CHANGES_REQUIRED"]},
+    "reviewer_agents": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "uniqueItems": true,
+      "items": {"enum": ["A09-SECURITY", "A10-QA", "A12-RED-TEAM"]}
+    },
+    "blocking_finding_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "report_ids": {"type": "array", "minItems": 3, "maxItems": 3, "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+  }
+}
