@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-factory.local/schemas/real-estate-localized-consumer-listing.schema.json",
+  "title": "Real Estate Localized Consumer Listing",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "canonical_id",
+    "canonical_url",
+    "locale",
+    "direction",
+    "title",
+    "location_text",
+    "price_text",
+    "currency_code",
+    "area_text",
+    "bedrooms_text",
+    "last_verified_text",
+    "state",
+    "trust_code",
+    "verification_badge",
+    "message_codes",
+    "messages"
+  ],
+  "properties": {
+    "canonical_id": {"type": "string", "minLength": 1},
+    "canonical_url": {"type": ["string", "null"]},
+    "locale": {"enum": ["fa-IR", "en-US"]},
+    "direction": {"enum": ["RTL", "LTR"]},
+    "title": {"type": "string"},
+    "location_text": {"type": "string"},
+    "price_text": {"type": "string"},
+    "currency_code": {"enum": ["IRR", "EUR", "USD"]},
+    "area_text": {"type": "string"},
+    "bedrooms_text": {"type": "string"},
+    "last_verified_text": {"type": "string"},
+    "state": {"type": "string", "minLength": 1},
+    "trust_code": {"type": "string", "minLength": 1},
+    "verification_badge": {"type": "boolean"},
+    "message_codes": {"type": "array", "items": {"type": "string"}},
+    "messages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "text", "fallback_used"],
+        "properties": {
+          "code": {"type": "string"},
+          "text": {"type": "string"},
+          "fallback_used": {"type": "boolean"}
+        }
+      }
+    }
+  }
+}
