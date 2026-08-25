@@ -1,9 +1,9 @@
 # AI Factory — Master Roadmap v2
 
 > **Status:** Active build  
-> **Current phase:** Phase 1 — Control Plane & Orchestrator Foundation  
+> **Current phase:** Phase 2 — Minimum Local Runtime  
 > **Architecture:** Hybrid deterministic Control Plane + bounded AI workers  
-> **Next milestone:** Define executable schemas/state transitions and pass the first Orchestrator mock evaluations.  
+> **Next milestone:** Persist mission/task/audit state and prove restart/resume without fabricated completion.  
 > **Repository purpose:** Build a reusable AI-native software organization that can turn product missions into verified software without requiring the human owner to manually coordinate every engineering role.
 
 ---
@@ -186,30 +186,32 @@ Exit status: **PASS — architecture revised before code lock-in**.
 
 ---
 
-## Phase 1 — Control Plane & Orchestrator Foundation 🚧 CURRENT
+## Phase 1 — Control Plane & Orchestrator Foundation ✅
 
 Goal: create the first executable coordination model without building the full worker workforce.
 
-Already created:
+Completed:
 
 - [x] `docs/agents/orchestrator.md`
+- [x] `schemas/mission.schema.json`
+- [x] `schemas/task.schema.json`
+- [x] `schemas/agent.schema.json`
+- [x] `schemas/artifact.schema.json`
+- [x] `schemas/review.schema.json`
+- [x] `schemas/action-proposal.schema.json`
+- [x] typed evidence/objection/event contracts and schemas
+- [x] deterministic task state-transition specification
+- [x] dependency graph validation and dependency-aware release rules
+- [x] capability/permission contract
+- [x] budget contract
+- [x] mock Agent Registry
+- [x] first orchestration evaluation fixtures
+- [x] append-only hash-chained audit ledger
+- [x] replayable in-memory mission runner
+- [x] runtime-enforced worker/reviewer independence
+- [x] end-to-end dependency/replay sample mission test
 
-Next deliverables:
-
-- [ ] `schemas/mission.schema.json`
-- [ ] `schemas/task.schema.json`
-- [ ] `schemas/agent.schema.json`
-- [ ] `schemas/artifact.schema.json`
-- [ ] `schemas/review.schema.json`
-- [ ] `schemas/action-proposal.schema.json`
-- [ ] deterministic task state-transition specification
-- [ ] dependency graph validation rules
-- [ ] capability/permission contract
-- [ ] budget contract
-- [ ] mock Agent Registry
-- [ ] first orchestration evaluation fixtures
-
-Required evaluation cases:
+Required evaluation cases covered:
 
 1. simple task chooses single-worker fast path,
 2. full-stack mission decomposes correctly,
@@ -224,35 +226,40 @@ Required evaluation cases:
 11. unsupported completion claim is rejected,
 12. timed-out external write is reconciled before retry.
 
-Exit criteria:
+Exit evidence:
 
-- sample missions become schema-valid dependency graphs,
+- sample missions become valid dependency graphs,
 - invalid state transitions are rejected by code,
-- permissions/budgets are represented outside prompts,
-- mock workers can run through create → verify → review → done,
-- audit events reproduce why each state transition occurred.
+- permissions/budgets exist outside prompts,
+- mock workers execute create → verify → review → done,
+- audit events reproduce state-transition history,
+- reviewer independence is enforced from recorded worker identity,
+- GitHub Actions passed on repository state containing the Phase 1 completion tests.
+
+Exit status: **PASS**.
 
 ---
 
-## Phase 2 — Minimum Local Runtime
+## Phase 2 — Minimum Local Runtime 🚧 CURRENT
 
-Goal: run the control plane locally with mocked or simple real workers.
+Goal: run the control plane locally with mocked or simple real workers and durable state.
 
 Deliverables:
 
 - [ ] Mission Intake service/module.
-- [ ] Agent Registry.
-- [ ] Task Graph store.
-- [ ] Event/Audit ledger.
+- [ ] persisted Agent Registry.
+- [ ] persisted Task Graph store.
+- [ ] durable Event/Audit ledger.
 - [ ] Artifact registry.
-- [ ] Policy Engine v0.
+- [ ] Policy Engine v0 integration.
 - [ ] Budget manager.
 - [ ] Approval state manager.
 - [ ] workspace isolation abstraction.
 - [ ] model/provider adapter interface.
 - [ ] structured tracing with redaction.
+- [ ] restart/resume reconciliation tests.
 
-Do not adopt distributed infrastructure unless local evaluation shows a real need.
+Do not adopt distributed infrastructure unless local evaluation shows a real need. Prefer a simple local transactional store first.
 
 Exit criteria: a mission survives restart and can resume from persisted state with no fabricated task completion.
 
@@ -450,4 +457,4 @@ Before changing AI Factory:
 9. Do not bypass governance or approval boundaries.
 10. Update roadmap/status when a phase's evidence genuinely changes.
 
-**Current next action:** implement Phase 1 schemas and deterministic state-transition rules, then create executable mock orchestration evaluations.
+**Current next action:** implement the Phase 2 local persistence boundary (mission/task/audit storage), then prove restart/resume and state reconciliation with automated tests before adding provider adapters.
