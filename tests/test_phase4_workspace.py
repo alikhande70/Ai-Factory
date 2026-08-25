@@ -25,14 +25,14 @@ class WorkspaceAssignmentTests(unittest.TestCase):
         first = allocator.allocate(item)
         second = allocator.allocate(item)
         self.assertEqual(first, second)
-        self.assertEqual(first.workspace_id, "mission-fancy:pkg-ui")
+        self.assertEqual(first.workspace_id, "Mission Fancy:PKG UI")
         self.assertEqual(first.branch_name, "factory/mission-fancy/pkg-ui")
         self.assertEqual(first.write_scopes, item.write_scopes)
 
     def test_assignment_cannot_widen_validated_scope(self):
         item = package()
         assignment = WorkspaceAssignment(
-            workspace_id="mission-42:pkg-fe",
+            workspace_id="MISSION-42:PKG-FE",
             mission_id=item.mission_id,
             package_id=item.package_id,
             owner_agent=item.owner_agent,
@@ -45,7 +45,7 @@ class WorkspaceAssignmentTests(unittest.TestCase):
     def test_assignment_cannot_change_owner(self):
         item = package()
         assignment = WorkspaceAssignment(
-            workspace_id="mission-42:pkg-fe",
+            workspace_id="MISSION-42:PKG-FE",
             mission_id=item.mission_id,
             package_id=item.package_id,
             owner_agent="A06-BACKEND",
@@ -53,6 +53,19 @@ class WorkspaceAssignmentTests(unittest.TestCase):
             write_scopes=item.write_scopes,
         )
         with self.assertRaisesRegex(ValueError, "owner_agent mismatch"):
+            assignment.validate_for(item)
+
+    def test_assignment_cannot_alias_another_canonical_identity(self):
+        item = package()
+        assignment = WorkspaceAssignment(
+            workspace_id="mission-42:pkg-fe",
+            mission_id=item.mission_id,
+            package_id=item.package_id,
+            owner_agent=item.owner_agent,
+            branch_name="factory/mission-42/pkg-fe",
+            write_scopes=item.write_scopes,
+        )
+        with self.assertRaisesRegex(ValueError, "preserve canonical"):
             assignment.validate_for(item)
 
 
