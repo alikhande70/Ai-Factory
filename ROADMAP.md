@@ -1,10 +1,10 @@
-# AI Factory — Master Roadmap v10
+# AI Factory — Master Roadmap v11
 
 > **Status:** Active build  
 > **Current phase:** Phase 10 — Mission 001: Real Estate Intelligence Platform  
-> **Current milestone:** Phase 10-A — Inventory Integrity Foundation  
+> **Current milestone:** Phase 10-C — Search & Geo Foundation  
 > **Architecture:** Hybrid deterministic Control Plane + bounded AI workers  
-> **Next milestone:** Build a persisted canonical inventory service with append-audited lifecycle, non-destructive duplicate grouping, freshness expiry, trust evidence and restart/migration tests.  
+> **Next milestone:** Complete deterministic search qualification with persistent geo indexing, exact radius semantics, stable cursor pagination, relevance regression fixtures and representative performance evidence.  
 > **Repository purpose:** Build a reusable AI-native software organization that can turn product missions into verified software without requiring the human owner to manually coordinate every engineering role.
 
 ---
@@ -150,7 +150,7 @@ Only deterministic runtime code may perform protected state transitions after va
 # 7. Build phases
 
 ## Phase 0 — Project Constitution ✅ PASS
-Master roadmap, repository entrypoint, initial organization, approval principle and evidence-before-completion principle.
+Master roadmap, repository entrypoint, organization, approval principle and evidence-before-completion principle.
 
 ## Phase 0.5 — Architecture Audit & Factory DNA ✅ PASS
 Manifesto, Company DNA, Governance, Autonomy Model, Threat Model and hybrid-control-plane ADR.
@@ -194,15 +194,7 @@ Reviewed memory promotion, append-audited durable memory, source-integrity check
 Evidence: `docs/evaluations/PHASE8_COMPLETION.md`.
 
 ## Phase 9 — Factory Qualification Mission ✅ PASS
-
-A bounded booking qualification compared the full Factory path against a simpler happy-path worker under the same protected dimensions.
-
-Qualified evidence:
-- Factory evidence coverage: `11/11` protected dimensions.
-- Simple baseline evidence coverage: `2/11`.
-- Factory false-completion proxy: `0.0`.
-- Simple path false-completion proxy when claiming the protected mission complete: `1.0`.
-- Factory deliberately incurred more work/latency; therefore the single-worker fast path remains mandatory where extra controls do not improve outcomes.
+A bounded booking qualification compared the full Factory path against a simpler happy-path worker under the same protected dimensions. Factory evidence coverage was `11/11` versus `2/11` for the simple path, while preserving the single-worker fast path for work where the extra controls do not improve outcome quality.
 
 Qualified executable head: `c07a5d443adc03507dee83d324b01a700ea34aab`; GitHub Actions run `32840227411` succeeded.
 
@@ -214,47 +206,76 @@ Mission charter: `docs/missions/MISSION001_REAL_ESTATE.md`.
 
 The product must not depend on unauthorized copying/republication of third-party listings. Rights basis and provenance are first-class domain data.
 
-### Phase 10-A — Inventory Integrity Foundation 🚧
+### Phase 10-A — Inventory Integrity Foundation ✅ PASS
 
-Implemented and executable:
-- [x] typed listing/property candidate contract
-- [x] explicit source-rights basis with unauthorized-scrape rejection
-- [x] deterministic listing lifecycle
-- [x] deterministic freshness/expiry scoring
-- [x] disclosure/completeness scoring
-- [x] duplicate fingerprint independent of publisher/source identity
-- [x] deterministic rank eligibility and inspectable baseline scoring
-- [x] stale/inactive rank suppression
-- [x] domain code isolated under `missions/real_estate/`
-- [x] CI tests for rights, lifecycle, freshness, dedupe, completeness and ranking
+Qualified capabilities:
+- typed listing/property contract,
+- explicit source-rights basis with unauthorized-scrape rejection,
+- deterministic lifecycle,
+- freshness/expiry scoring,
+- completeness scoring,
+- duplicate fingerprint independent of publisher/source identity,
+- explainable baseline ranking,
+- stale/inactive rank suppression,
+- isolated mission-domain code and CI coverage.
 
-Qualified head for first executable slice: `571c4819bcecd904adc413f1409f0f542569dd9f`; GitHub Actions run `32844576057` succeeded.
+Qualified head: `571c4819bcecd904adc413f1409f0f542569dd9f`; GitHub Actions run `32844576057` succeeded.
 
 Evidence: `docs/evaluations/PHASE10_PROGRESS.md`.
 
-### Phase 10-B — Canonical Inventory Persistence ← NEXT
+### Phase 10-B — Canonical Inventory Persistence ✅ PASS
 
-Build:
-- [ ] persisted immutable source records
-- [ ] canonical listing projection
-- [ ] non-destructive duplicate-group membership
-- [ ] append-audited lifecycle history
-- [ ] deterministic freshness sweeper that expires rather than deletes
-- [ ] publisher trust evidence contract
-- [ ] query/filter contract for transaction/property/location/price/core attributes
-- [ ] restart/recovery tests
-- [ ] idempotent schema migration tests
+Qualified capabilities:
+- persisted immutable source-version records,
+- canonical listing projection,
+- non-destructive duplicate membership,
+- append-preserved lifecycle history,
+- deterministic freshness sweeper that expires rather than deletes,
+- publisher trust requiring evidence,
+- structured inventory filtering,
+- restart/recovery,
+- idempotent schema migration.
+
+Qualified head: `1d3da1314e9f770e9a0b3023794ed4a534d0610c`; GitHub Actions run `32844827664` succeeded.
+
+Evidence: `docs/evaluations/PHASE10B_COMPLETION.md`.
+
+### Phase 10-C — Search & Geo Foundation 🚧 CURRENT
+
+Implemented and CI-qualified so far:
+- [x] deterministic normalized search query/result/page contracts
+- [x] search over canonical inventory rather than raw duplicate source records
+- [x] structured transaction/property/location/price/bedroom filters
+- [x] geo-cell prefix filtering
+- [x] deterministic text relevance over title/description/location
+- [x] freshness/completeness/publisher-trust ranking evidence
+- [x] no invented publisher trust when evidence is absent
+- [x] stale/inactive search suppression
+- [x] stable cursor pagination and query-bound cursor signature
+- [x] deterministic canonical-id tie-breaker for equal-score/equal-time results
+- [x] persisted SQLite geo index with idempotent migration and restart recovery
+- [x] exact Haversine radius filtering after coarse bounding-box narrowing
+- [x] radius search remains separate from canonical rights/lifecycle authority
+- [x] machine-readable `schemas/real-estate-search.schema.json`
+- [x] search/geo regression tests in repository CI
+
+Evidence: `docs/evaluations/PHASE10C_PROGRESS.md`.
+
+Remaining before Phase 10-C can be marked PASS:
+- [ ] protected relevance fixture with explicit expected ordering across a broader query set
+- [ ] representative synthetic-inventory performance measurement and documented threshold/baseline
+- [ ] search result/schema documentation alignment
+- [ ] final Phase 10-C completion audit on a qualified head
 
 ### Later Mission 001 slices
 
-After 10-B, proceed through:
-- Search/geospatial indexing and relevance evaluation
-- Saved search/alerts
-- Trust/fraud review queue and anomaly evidence
-- publisher/consumer UX flows
-- SEO/discovery surfaces
-- localization/market adapters
-- domain assurance and bounded full-stack qualification
+After 10-C:
+- Phase 10-D Saved Search & Alerts
+- Phase 10-E Trust/Fraud Review Queue & Anomaly Evidence
+- Phase 10-F Publisher/Consumer UX flows
+- Phase 10-G SEO/discovery surfaces
+- Phase 10-H Localization/market adapters
+- Phase 10-I Domain assurance and bounded full-stack qualification
 
 Opaque ML ranking, identity-document processing, payments, financial products and production deployment remain deferred until the appropriate policy/security/human gates exist.
 
@@ -306,4 +327,4 @@ Before changing AI Factory:
 12. Keep mission-specific code outside the reusable Factory core unless a reusable abstraction is proven.
 13. For Mission 001, reject ingestion without an allowed rights basis and never equate model confidence with trust/verification evidence.
 
-**Current next action:** implement Phase 10-B canonical inventory persistence and prove non-destructive duplicate grouping, freshness expiry, lifecycle audit, restart recovery and idempotent migration behavior in CI.
+**Current next action:** finish Phase 10-C relevance/performance qualification, document the protected baseline, then perform the Phase 10-C completion audit before moving to saved searches and alerts.
