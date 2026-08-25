@@ -1,10 +1,10 @@
-# AI Factory — Master Roadmap v11
+# AI Factory — Master Roadmap v12
 
 > **Status:** Active build  
 > **Current phase:** Phase 10 — Mission 001: Real Estate Intelligence Platform  
-> **Current milestone:** Phase 10-C — Search & Geo Foundation  
+> **Current milestone:** Phase 10-E — Trust/Fraud Review Queue & Anomaly Evidence  
 > **Architecture:** Hybrid deterministic Control Plane + bounded AI workers  
-> **Next milestone:** Complete deterministic search qualification with persistent geo indexing, exact radius semantics, stable cursor pagination, relevance regression fixtures and representative performance evidence.  
+> **Next milestone:** Build evidence-preserving anomaly findings, a durable operator review queue, independent trust decisions and tests proving suspicion cannot silently become a fraud verdict.  
 > **Repository purpose:** Build a reusable AI-native software organization that can turn product missions into verified software without requiring the human owner to manually coordinate every engineering role.
 
 ---
@@ -110,6 +110,7 @@ Roles are logical specialists, not necessarily twelve continuously running proce
 - Memory lifecycle is append-audited; supersession/deprecation replace destructive rewrites.
 - Self-improvement may propose changes; it cannot silently rewrite governance, protected evals or its own evaluator.
 - Domain missions may extend contracts but may not weaken the reusable Factory governance boundary.
+- In Mission 001, suspicion/anomaly score is evidence for review, never an automatic fraud verdict or trust badge.
 
 ---
 
@@ -208,70 +209,54 @@ The product must not depend on unauthorized copying/republication of third-party
 
 ### Phase 10-A — Inventory Integrity Foundation ✅ PASS
 
-Qualified capabilities:
-- typed listing/property contract,
-- explicit source-rights basis with unauthorized-scrape rejection,
-- deterministic lifecycle,
-- freshness/expiry scoring,
-- completeness scoring,
-- duplicate fingerprint independent of publisher/source identity,
-- explainable baseline ranking,
-- stale/inactive rank suppression,
-- isolated mission-domain code and CI coverage.
-
 Qualified head: `571c4819bcecd904adc413f1409f0f542569dd9f`; GitHub Actions run `32844576057` succeeded.
 
 Evidence: `docs/evaluations/PHASE10_PROGRESS.md`.
 
 ### Phase 10-B — Canonical Inventory Persistence ✅ PASS
 
-Qualified capabilities:
-- persisted immutable source-version records,
-- canonical listing projection,
-- non-destructive duplicate membership,
-- append-preserved lifecycle history,
-- deterministic freshness sweeper that expires rather than deletes,
-- publisher trust requiring evidence,
-- structured inventory filtering,
-- restart/recovery,
-- idempotent schema migration.
-
 Qualified head: `1d3da1314e9f770e9a0b3023794ed4a534d0610c`; GitHub Actions run `32844827664` succeeded.
 
 Evidence: `docs/evaluations/PHASE10B_COMPLETION.md`.
 
-### Phase 10-C — Search & Geo Foundation 🚧 CURRENT
+### Phase 10-C — Search & Geo Foundation ✅ PASS
 
-Implemented and CI-qualified so far:
-- [x] deterministic normalized search query/result/page contracts
-- [x] search over canonical inventory rather than raw duplicate source records
-- [x] structured transaction/property/location/price/bedroom filters
-- [x] geo-cell prefix filtering
-- [x] deterministic text relevance over title/description/location
-- [x] freshness/completeness/publisher-trust ranking evidence
-- [x] no invented publisher trust when evidence is absent
-- [x] stale/inactive search suppression
-- [x] stable cursor pagination and query-bound cursor signature
-- [x] deterministic canonical-id tie-breaker for equal-score/equal-time results
-- [x] persisted SQLite geo index with idempotent migration and restart recovery
-- [x] exact Haversine radius filtering after coarse bounding-box narrowing
-- [x] radius search remains separate from canonical rights/lifecycle authority
-- [x] machine-readable `schemas/real-estate-search.schema.json`
-- [x] search/geo regression tests in repository CI
+Qualified capabilities include deterministic canonical search, structured filters, duplicate collapse, persisted geo index, exact Haversine radius refinement, stable query-bound cursor pagination, deterministic tie-breaking, explainable freshness/completeness/trust ranking, protected relevance fixtures and a controlled synthetic performance baseline.
 
-Evidence: `docs/evaluations/PHASE10C_PROGRESS.md`.
+Qualified executable head: `845b6f783f292d81d5023fa8aee32e54eeda3082`; GitHub Actions run `32850928685` succeeded.
 
-Remaining before Phase 10-C can be marked PASS:
-- [ ] protected relevance fixture with explicit expected ordering across a broader query set
-- [ ] representative synthetic-inventory performance measurement and documented threshold/baseline
-- [ ] search result/schema documentation alignment
-- [ ] final Phase 10-C completion audit on a qualified head
+Evidence: `docs/evaluations/PHASE10C_COMPLETION.md` and `docs/missions/REAL_ESTATE_SEARCH.md`.
+
+### Phase 10-D — Saved Search & Alerts ✅ PASS
+
+Qualified capabilities include durable saved-query definitions, no-alert initial baseline, exactly-once internal alert events for newly qualifying canonical inventory, restart/replay idempotency, query-version isolation/re-baselining, disabled-search behavior, lifecycle/freshness inheritance and full multi-page evaluation beyond 100 results.
+
+External delivery is deliberately not implemented or claimed; `PENDING_INTERNAL` is not proof of notification delivery.
+
+Qualified executable head: `c181c9074953a3e6e1a349f82d27ec56da19f12a`; GitHub Actions run `32851789930` succeeded.
+
+Evidence: `docs/evaluations/PHASE10D_COMPLETION.md` and `docs/missions/REAL_ESTATE_ALERTS.md`.
+
+### Phase 10-E — Trust/Fraud Review Queue & Anomaly Evidence 🚧 CURRENT
+
+Goal: detect suspicious inventory patterns without converting probabilistic suspicion into an automatic accusation or trust decision.
+
+Required baseline:
+- [ ] typed anomaly finding with severity, evidence references, detector identity and affected canonical/source IDs
+- [ ] deterministic detector baseline for inspectable anomalies
+- [ ] persisted append-audited review queue
+- [ ] explicit `OPEN / IN_REVIEW / RESOLVED / DISMISSED` review lifecycle
+- [ ] reviewer identity distinct from detector for high-impact trust decisions
+- [ ] evidence required for resolution/trust-impact action
+- [ ] no automatic deletion or fraud label from anomaly score alone
+- [ ] duplicate/anomaly evidence preserved across restart
+- [ ] machine-readable anomaly/review schemas
+- [ ] tests for false-positive safe handling, replay/idempotency and stale evidence
+- [ ] controlled qualification report
 
 ### Later Mission 001 slices
 
-After 10-C:
-- Phase 10-D Saved Search & Alerts
-- Phase 10-E Trust/Fraud Review Queue & Anomaly Evidence
+After 10-E:
 - Phase 10-F Publisher/Consumer UX flows
 - Phase 10-G SEO/discovery surfaces
 - Phase 10-H Localization/market adapters
@@ -326,5 +311,6 @@ Before changing AI Factory:
 11. Do not weaken benchmarks/evaluators to make a worker pass.
 12. Keep mission-specific code outside the reusable Factory core unless a reusable abstraction is proven.
 13. For Mission 001, reject ingestion without an allowed rights basis and never equate model confidence with trust/verification evidence.
+14. For Phase 10-E, anomaly findings may queue review but cannot by themselves create a fraud verdict, verification badge or destructive listing action.
 
-**Current next action:** finish Phase 10-C relevance/performance qualification, document the protected baseline, then perform the Phase 10-C completion audit before moving to saved searches and alerts.
+**Current next action:** implement the Phase 10-E anomaly contracts and durable review queue, then qualify independent evidence-based resolution before any automated trust-impact action is considered.
