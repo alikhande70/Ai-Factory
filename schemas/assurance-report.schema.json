@@ -4,7 +4,7 @@
   "title": "AssuranceReport",
   "type": "object",
   "additionalProperties": false,
-  "required": ["report_id", "mission_id", "reviewer_agent", "subject_artifact_ref", "findings", "verification_refs"],
+  "required": ["report_id", "mission_id", "reviewer_agent", "subject_artifact_ref", "findings", "verification_refs", "acceptance_coverage"],
   "properties": {
     "report_id": {"type": "string", "minLength": 1},
     "mission_id": {"type": "string", "minLength": 1},
@@ -28,6 +28,18 @@
         }
       }
     },
-    "verification_refs": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+    "verification_refs": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "acceptance_coverage": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["criterion_id", "evidence_refs"],
+        "properties": {
+          "criterion_id": {"type": "string", "minLength": 1},
+          "evidence_refs": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+        }
+      }
+    }
   }
 }
