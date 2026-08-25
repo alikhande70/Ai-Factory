@@ -1,9 +1,9 @@
-# AI Factory — Master Roadmap v5
+# AI Factory — Master Roadmap v6
 
 > **Status:** Active build  
-> **Current phase:** Phase 5 — Assurance Pod  
+> **Current phase:** Phase 6 — Reliability & Durable Execution  
 > **Architecture:** Hybrid deterministic Control Plane + bounded AI workers  
-> **Next milestone:** Make A09 Security, A10 QA/Test and A12 Red Team independently reject and drive correction of unsafe or weak integrated work with typed, evidence-backed findings.  
+> **Next milestone:** Implement A11 DevOps/Reliability and deterministic durable-execution guards for retries, timeouts, idempotency, reconciliation and recovery; then qualify restart/rollback behavior with executable evidence.  
 > **Repository purpose:** Build a reusable AI-native software organization that can turn product missions into verified software without requiring the human owner to manually coordinate every engineering role.
 
 ---
@@ -187,12 +187,10 @@ Qualified head: `4b2bd2d85e05b444f095c716be96b8c7e40ccb27`; GitHub Actions run `
 
 Exit criteria satisfied for controlled local qualification: Design Pod artifacts can produce an integrated working application, and engineering work cannot qualify without declared scope, DesignBundle traceability and executable evidence.
 
-## Phase 5 — Assurance Pod 🚧 CURRENT
+## Phase 5 — Assurance Pod ✅ PASS
 
-Goal: make independent reviewers **reject and drive correction** of weak or unsafe integrated work, not merely write critique.
-
-Current implementation:
-- [x] typed `AssuranceFinding`, `AssuranceReport` and `AssuranceDecision`
+Qualified:
+- [x] typed `AssuranceFinding`, `AssuranceReport`, `AssuranceDecision` and `AcceptanceCoverage`
 - [x] A09 Security worker contract
 - [x] A10 QA/Test worker contract
 - [x] A12 Red-Team worker contract
@@ -202,24 +200,40 @@ Current implementation:
 - [x] deterministic `PASS` vs `CHANGES_REQUIRED`
 - [x] persisted assurance reports and decision through Artifact Registry
 - [x] machine-readable Assurance schemas
-- [x] executable initial tests for clean pass, security block and independence failure
+- [x] executable threat-model test families
+- [x] acceptance-criterion coverage accounting for A10
+- [x] adversarial integration-seam scenarios for A12
+- [x] bounded remediation/re-review loop
+- [x] stale prior assurance after corrected engineering artifacts
+- [x] release-readiness fingerprint bound to exact reviewed IntegrationManifest
+- [x] proof that blocking findings cannot reach release-ready state
 
-Remaining Phase 5 work:
-- [ ] executable threat-model test families
-- [ ] acceptance-criterion coverage accounting for A10
-- [ ] adversarial integration-seam scenarios for A12
-- [ ] bounded remediation/re-review loop
-- [ ] stale prior assurance after corrected engineering artifacts
-- [ ] prove blocking findings cannot reach release state
-- [ ] final Phase 5 qualification report and CI evidence
+Exit evidence: `docs/evaluations/PHASE5_COMPLETION.md`.
 
-Exit criteria: weak/unsafe work is measurably rejected and corrected; unresolved blocking findings cannot be promoted to release-ready state.
+Qualified head: `68c8ccef07546dbfcb620cb024d6cac633fba041`; GitHub Actions run `32829332092` succeeded with 94 tests and zero failures under ResourceWarning-as-error.
 
-## Phase 6 — Reliability & Durable Execution
+Exit criteria satisfied for controlled local qualification: weak/unsafe work is measurably rejected and corrected; unresolved blocking findings cannot be promoted to release-ready state.
 
-Implement A11 DevOps/Reliability and harden long-running execution: resumable workflows, bounded retries, idempotency/reconciliation, timeouts/circuit breakers, CI/CD, logging/metrics/traces, preview environments and rollback strategy.
+## Phase 6 — Reliability & Durable Execution 🚧 CURRENT
 
-A durable workflow engine may be adopted only behind an abstraction after benchmark comparison.
+Goal: make long-running Factory execution recoverable and side-effect safe rather than merely retryable.
+
+Current work:
+- [ ] A11 DevOps/Reliability agent contract
+- [ ] typed operation, retry, attempt, reconciliation and recovery contracts
+- [ ] deterministic retry/reconcile/stop/complete decision engine
+- [ ] unknown external-write outcome must reconcile before retry
+- [ ] idempotency requirements for side-effecting operations
+- [ ] bounded retries and retry-budget exhaustion behavior
+- [ ] timeout and circuit-breaker state model
+- [ ] resumable execution and restart/recovery evaluation
+- [ ] compensation/rollback plan contract for applicable operations
+- [ ] structured reliability events/metrics
+- [ ] final Phase 6 qualification report and CI evidence
+
+A durable workflow engine may be adopted only behind an abstraction after benchmark comparison; the Factory must not depend on one vendor for canonical semantics.
+
+Exit criteria: after interruption or ambiguous side-effect outcome, canonical state can be recovered without blind duplicate actions; retry/circuit/rollback rules are deterministic, bounded and auditable.
 
 ## Phase 7 — Interoperability
 
@@ -280,4 +294,4 @@ Before changing AI Factory:
 8. Do not bypass governance or approval boundaries.
 9. Update roadmap/status only when evidence genuinely changes.
 
-**Current next action:** implement executable Phase 5 threat/QA/red-team test families and a bounded remediation/re-review loop that invalidates stale assurance after corrected engineering artifacts.
+**Current next action:** implement A11 and the deterministic reliability contracts/decision engine, then qualify side-effect reconciliation and restart/recovery before expanding deployment machinery.
