@@ -19,9 +19,10 @@ class TaskRuntimeRecord:
 class MissionRunner:
     """Minimal deterministic Phase 1 runner.
 
-    The runner owns canonical task state transitions and records every accepted
-    transition in the append-only ledger. Worker/model behavior is intentionally
-    outside this class.
+    Canonical task state only changes after the corresponding audit event has
+    been accepted by the append-only ledger. This keeps state and history
+    atomic for all validation/ledger failures in this in-memory Phase 1 model.
+    Worker/model behavior is intentionally outside this class.
     """
 
     def __init__(self, mission_id: str, task_ids: Iterable[str], ledger: AuditLedger | None = None) -> None:
@@ -56,14 +57,7 @@ class MissionRunner:
         validate_transition(record.state, target, ctx)
 
         previous = record.state
-        record.state = target
-        if evidence_ids:
-            record.evidence_ids = evidence_ids
-        if reviewer_ids:
-            record.reviewer_ids = reviewer_ids
-        record.blocking_objections = blocking_objections
-
-        return self.ledger.append(
+        event = self.ledger.append(
             event_id=event_id or f"EVT-{len(self.ledger.events()) + 1:06d}",
             mission_id=self.mission_id,
             actor_id=actor_id,
@@ -79,6 +73,15 @@ class MissionRunner:
             },
         )
 
+        # Commit canonical state only after the append succeeds.
+        record.state = target
+        if evidence_ids:
+            record.evidence_ids = evidence_ids
+        if reviewer_ids:
+            record.reviewer_ids = reviewer_ids
+        record.blocking_objections = blocking_objections
+        return event
+
     def _task(self, task_id: str) -> TaskRuntimeRecord:
         try:
             return self.tasks[task_id]
@@ -93,9 +96,9 @@ class MissionRunner:
 
     @classmethod
     def replay(cls, mission_id: str, task_ids: Iterable[str], events: Iterable[AuditEvent]) -> "MissionRunner":
-        ledger = AuditLedger.from_events(events)
+        source_ledger = AuditLedger.from_events(events)
         runner = cls(mission_id, task_ids, AuditLedger())
-        for event in ledger.events(mission_id):
+        for event in source_ledger.events(mission_id):
             if event.event_type != "TASK_STATE_TRANSITION":
                 continue
             payload = event.payload
