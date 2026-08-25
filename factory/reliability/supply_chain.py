@@ -11,7 +11,7 @@ from typing import Iterable
 
 
 ACTION_REF = re.compile(r"^([A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+)@([0-9a-f]{40})$")
-USES_LINE = re.compile(r"^\s*uses:\s*([^\s#]+)")
+USES_LINE = re.compile(r"^\s*(?:-\s*)?uses:\s*([^\s#]+)")
 
 
 @dataclass(frozen=True)
