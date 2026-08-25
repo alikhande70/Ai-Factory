@@ -5,6 +5,7 @@ from datetime import datetime
 from enum import Enum
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
+from .discovery import DiscoveryDocument
 from .presentation import ConsumerListingProjection
 
 
@@ -69,6 +70,23 @@ class LocalizedConsumerListing:
     messages: tuple[LocalizedMessage, ...]
 
 
+@dataclass(frozen=True)
+class LocalizedDiscoveryDocument:
+    canonical_id: str
+    locale: str
+    direction: TextDirection
+    canonical_url: str
+    route_path: str
+    indexable: bool
+    robots_directive: str
+    noindex_reasons: tuple[str, ...]
+    title: str
+    description: str
+    lastmod: str
+    structured_data_profile: str
+    structured_data: dict[str, object]
+
+
 _MESSAGES: dict[str, dict[str, str]] = {
     "fa-IR": {
         "LISTING_STALE": "این آگهی نیاز به بررسی تازگی دارد.",
@@ -105,7 +123,6 @@ class RealEstateMarketAdapter:
         catalog = _MESSAGES[self.context.locale]
         if code in catalog:
             return LocalizedMessage(code=code, text=catalog[code], fallback_used=False)
-        # Deterministic, observable fallback: preserve the code rather than inventing copy.
         return LocalizedMessage(code=code, text=f"[{code}]", fallback_used=True)
 
     def format_integer(self, value: int) -> str:
@@ -177,4 +194,27 @@ class RealEstateMarketAdapter:
             verification_badge=projection.verification_badge,
             message_codes=projection.message_codes,
             messages=messages,
+        )
+
+    def localize_discovery_document(self, document: DiscoveryDocument) -> LocalizedDiscoveryDocument:
+        """Localize the display shell while copying SEO authority fields verbatim.
+
+        Translation is deliberately not fabricated. Until a reviewed translation
+        artifact exists, title/description remain the qualified canonical text.
+        """
+
+        return LocalizedDiscoveryDocument(
+            canonical_id=document.canonical_id,
+            locale=self.context.locale,
+            direction=self.context.direction,
+            canonical_url=document.canonical_url,
+            route_path=document.route_path,
+            indexable=document.indexable,
+            robots_directive=document.robots_directive,
+            noindex_reasons=document.noindex_reasons,
+            title=document.title,
+            description=document.description,
+            lastmod=document.lastmod,
+            structured_data_profile=document.structured_data_profile,
+            structured_data=dict(document.structured_data),
         )
