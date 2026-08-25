@@ -1,9 +1,9 @@
-# AI Factory — Master Roadmap v6
+# AI Factory — Master Roadmap v7
 
 > **Status:** Active build  
-> **Current phase:** Phase 6 — Reliability & Durable Execution  
+> **Current phase:** Phase 7 — Interoperability  
 > **Architecture:** Hybrid deterministic Control Plane + bounded AI workers  
-> **Next milestone:** Implement A11 DevOps/Reliability and deterministic durable-execution guards for retries, timeouts, idempotency, reconciliation and recovery; then qualify restart/rollback behavior with executable evidence.  
+> **Next milestone:** Implement protocol-versioned MCP and A2A boundary adapters while keeping internal schemas/state canonical; qualify translation, capability discovery, rejection of unsupported protocol versions, and no-privilege-escalation behavior.  
 > **Repository purpose:** Build a reusable AI-native software organization that can turn product missions into verified software without requiring the human owner to manually coordinate every engineering role.
 
 ---
@@ -29,6 +29,8 @@ SECURITY / QA / RED TEAM
   ↓
 RELIABILITY / RELEASE
   ↓
+INTEROPERABILITY ADAPTERS
+  ↓
 HUMAN GATE WHEN REQUIRED
   ↓
 DEPLOYMENT / MAINTENANCE
@@ -53,7 +55,7 @@ The Factory uses:
 7. **Human gates** for protected external, financial, identity-bound, destructive and other high-impact actions.
 8. **Single-worker fast path** when additional agents do not create measurable value.
 9. **Mission Pods** that activate only the specialist roles a mission needs.
-10. **Provider independence**: internal schemas/state remain canonical; MCP/A2A/provider SDKs are adapters.
+10. **Provider independence**: internal schemas/state remain canonical; MCP/A2A/provider SDKs are boundary adapters, never sources of authority.
 
 See `docs/foundation/FINAL_ARCHITECTURE_AUDIT.md` and `docs/architecture/decisions/ADR-0001-hybrid-control-plane.md`.
 
@@ -94,6 +96,7 @@ Roles are logical specialists, not necessarily twelve continuously running proce
 - Multi-agent execution is justified by value, not aesthetics.
 - Irreversible or consequential external actions cross the required human/policy gate.
 - Review independence is a runtime property, not an agent-count claim.
+- External protocols may transport requests/results but cannot directly mutate canonical authority, policy or permissions.
 
 ---
 
@@ -105,7 +108,7 @@ The Factory maintains three distinct state classes:
 - **Worker Scratch State:** ephemeral task-local context; disposable and untrusted by default.
 - **Organizational Memory:** reusable lessons/patterns promoted only through review and provenance.
 
-Raw user/web/tool content must never automatically become trusted long-term memory.
+Raw user/web/tool/protocol content must never automatically become trusted long-term memory.
 
 ---
 
@@ -139,105 +142,83 @@ Completed: master roadmap, repository entrypoint, initial organization, human-ap
 
 ## Phase 0.5 — Architecture Audit & Factory DNA ✅ PASS
 
-Completed foundation documents:
-- `FINAL_ARCHITECTURE_AUDIT.md`
-- `MANIFESTO.md`
-- `COMPANY_DNA.md`
-- `GOVERNANCE.md`
-- `AUTONOMY_MODEL.md`
-- `THREAT_MODEL.md`
-- `ADR-0001-hybrid-control-plane.md`
+Completed: Manifesto, Company DNA, Governance, Autonomy Model, Threat Model and hybrid-control-plane ADR.
 
 ## Phase 1 — Control Plane & Orchestrator Foundation ✅ PASS
 
-Qualified: A01 contract, typed mission/task/agent/artifact/review/action/evidence/objection/event contracts, deterministic state transitions, dependency validation, permission/budget contracts, audit ledger, replayable mission runner, reviewer-independence checks and orchestration evaluations.
+Qualified: A01 contract, typed core contracts, deterministic state transitions, dependency validation, permissions/budgets, audit ledger, replayable mission runner, reviewer independence and orchestration evaluations.
 
 ## Phase 2 — Minimum Local Runtime ✅ PASS
 
-Qualified: Mission Intake, persisted Agent Registry, task/mission persistence, durable local audit ledger, Artifact Registry, Policy Engine v0, Budget Manager, Approval State Manager, workspace abstraction, provider adapter, structured redacted tracing and restart/resume tests.
+Qualified: Mission Intake, persisted Agent Registry, mission/task persistence, durable local audit ledger, Artifact Registry, Policy Engine v0, Budget Manager, Approval State Manager, workspace abstraction, provider adapter, structured redacted tracing and restart/resume tests.
 
 Evidence: `docs/evaluations/PHASE2_COMPLETION.md`.
 
 ## Phase 3 — Design Pod ✅ PASS
 
-Qualified: A02 Product, A03 System Architecture and A04 UI/UX contracts; typed DesignBundle; deterministic cross-role validation; bounded role-targeted revision; downstream regeneration; ambiguity/contradiction evals; persisted design artifacts.
+Qualified: A02/A03/A04 contracts, typed DesignBundle, deterministic cross-role validation, bounded revision, downstream regeneration, ambiguity/contradiction evals and persisted design artifacts.
 
 Evidence: `docs/evaluations/PHASE3_COMPLETION.md`.
 
 ## Phase 4 — Engineering Pod ✅ PASS
 
-Qualified:
-- [x] A05 Frontend contract
-- [x] A06 Backend contract
-- [x] A07 Database contract
-- [x] A08 AI & Automation contract
-- [x] typed implementation work-package/evidence/integration contracts and schemas
-- [x] deterministic DesignBundle traceability and MUST ownership checks
-- [x] write-scope/dependency conflict validation
-- [x] isolated workspace/branch assignment model
-- [x] bounded plan and implementation revision loops
-- [x] dependency-aware IntegrationManifest with artifact/path ownership checks
-- [x] persisted engineering evidence and integration artifacts
-- [x] explicit DesignBundle → EngineeringPlan qualification fixture
-- [x] controlled frontend/backend/database working application evaluation
+Qualified: A05–A08 contracts, implementation/evidence/integration contracts, DesignBundle traceability, write-scope isolation, bounded revision loops, IntegrationManifest, persisted engineering artifacts and controlled full-stack qualification app.
 
-Exit evidence: `docs/evaluations/PHASE4_COMPLETION.md`.
-
-Qualified head: `4b2bd2d85e05b444f095c716be96b8c7e40ccb27`; GitHub Actions run `32823650154` succeeded.
-
-Exit criteria satisfied for controlled local qualification: Design Pod artifacts can produce an integrated working application, and engineering work cannot qualify without declared scope, DesignBundle traceability and executable evidence.
+Evidence: `docs/evaluations/PHASE4_COMPLETION.md`.
 
 ## Phase 5 — Assurance Pod ✅ PASS
 
+Qualified: A09/A10/A12 independent assurance, typed findings/reports/decisions, threat-model tests, acceptance coverage, adversarial seams, remediation/re-review and exact release-readiness fingerprinting.
+
+Evidence: `docs/evaluations/PHASE5_COMPLETION.md`.
+
+## Phase 6 — Reliability & Durable Execution ✅ PASS
+
 Qualified:
-- [x] typed `AssuranceFinding`, `AssuranceReport`, `AssuranceDecision` and `AcceptanceCoverage`
-- [x] A09 Security worker contract
-- [x] A10 QA/Test worker contract
-- [x] A12 Red-Team worker contract
-- [x] deterministic requirement for all three assurance roles
-- [x] reviewer-vs-implementer independence guard
-- [x] HIGH/CRITICAL findings forced to blocking
-- [x] deterministic `PASS` vs `CHANGES_REQUIRED`
-- [x] persisted assurance reports and decision through Artifact Registry
-- [x] machine-readable Assurance schemas
-- [x] executable threat-model test families
-- [x] acceptance-criterion coverage accounting for A10
-- [x] adversarial integration-seam scenarios for A12
-- [x] bounded remediation/re-review loop
-- [x] stale prior assurance after corrected engineering artifacts
-- [x] release-readiness fingerprint bound to exact reviewed IntegrationManifest
-- [x] proof that blocking findings cannot reach release-ready state
+- [x] A11 DevOps/Reliability contract
+- [x] typed operation/attempt/recovery/circuit/deadline/compensation/metric contracts
+- [x] deterministic COMPLETE / RETRY / RECONCILE / STOP decision engine
+- [x] external-write idempotency and reconciliation requirements
+- [x] unknown external-write outcome reconciles before retry
+- [x] bounded retries and retry-budget exhaustion
+- [x] persisted circuit breaker and explicit HALF_OPEN probe
+- [x] persisted timeout/deadline observations
+- [x] transactional attempt + decision + circuit persistence
+- [x] restart-safe mixed mission recovery
+- [x] compensation/rollback contract with success evidence
+- [x] durable reliability metrics and shared runtime tracing bridge
+- [x] release-preview boundary with exact reviewed fingerprint and rollback reference
+- [x] explicit human gate for production release plan
 
-Exit evidence: `docs/evaluations/PHASE5_COMPLETION.md`.
+Evidence: `docs/evaluations/PHASE6_COMPLETION.md`.
 
-Qualified head: `68c8ccef07546dbfcb620cb024d6cac633fba041`; GitHub Actions run `32829332092` succeeded with 94 tests and zero failures under ResourceWarning-as-error.
+Qualified executable head: `1c018b6d20777ee80ddc71a9343718c1b380fd87`; GitHub Actions run `32834489886` succeeded. No production deployment or external side effect was performed.
 
-Exit criteria satisfied for controlled local qualification: weak/unsafe work is measurably rejected and corrected; unresolved blocking findings cannot be promoted to release-ready state.
+Exit criterion satisfied for controlled local qualification: after interruption or ambiguous side-effect outcome, canonical state can be recovered without blind duplicate actions; retry/circuit/rollback rules are deterministic, bounded and auditable.
 
-## Phase 6 — Reliability & Durable Execution 🚧 CURRENT
+## Phase 7 — Interoperability 🚧 CURRENT
 
-Goal: make long-running Factory execution recoverable and side-effect safe rather than merely retryable.
+Goal: connect the Factory to external tools and independent agents without allowing transport protocols to redefine internal authority or canonical semantics.
 
-Current work:
-- [ ] A11 DevOps/Reliability agent contract
-- [ ] typed operation, retry, attempt, reconciliation and recovery contracts
-- [ ] deterministic retry/reconcile/stop/complete decision engine
-- [ ] unknown external-write outcome must reconcile before retry
-- [ ] idempotency requirements for side-effecting operations
-- [ ] bounded retries and retry-budget exhaustion behavior
-- [ ] timeout and circuit-breaker state model
-- [ ] resumable execution and restart/recovery evaluation
-- [ ] compensation/rollback plan contract for applicable operations
-- [ ] structured reliability events/metrics
-- [ ] final Phase 6 qualification report and CI evidence
+Protocol baselines for the first adapter qualification:
+- MCP specification `2026-07-28` (stateless core; version must be explicit at adapter boundary).
+- A2A released specification `1.0.0` (canonical data model with multiple protocol bindings).
 
-A durable workflow engine may be adopted only behind an abstraction after benchmark comparison; the Factory must not depend on one vendor for canonical semantics.
+Planned deliverables:
+- [ ] protocol-neutral boundary types for external capabilities/tasks/results
+- [ ] MCP adapter interface for tool/context discovery and calls
+- [ ] A2A adapter interface for external-agent discovery and task delegation
+- [ ] explicit protocol-version negotiation/rejection
+- [ ] translation from external messages into internal typed proposals, never direct state mutation
+- [ ] capability intersection with Factory permissions/Policy Engine
+- [ ] correlation/idempotency identifiers at adapter boundary
+- [ ] untrusted payload labeling and provenance
+- [ ] adapter timeout/error mapping into Phase 6 reliability semantics
+- [ ] executable compatibility fixtures for MCP and A2A
+- [ ] malicious/over-privileged external capability rejection tests
+- [ ] final Phase 7 qualification report and CI evidence
 
-Exit criteria: after interruption or ambiguous side-effect outcome, canonical state can be recovered without blind duplicate actions; retry/circuit/rollback rules are deterministic, bounded and auditable.
-
-## Phase 7 — Interoperability
-
-Add MCP tool/context adapters, A2A external-agent adapter, provider-specific agent SDK adapters and sandbox-provider adapters where useful. Internal schemas remain canonical.
+Exit criteria: supported external tools/agents can be discovered and invoked/delegated through deterministic adapters while unsupported versions, privilege escalation, malformed data and ambiguous side effects are safely rejected or routed into existing reliability/reconciliation mechanisms.
 
 ## Phase 8 — Organizational Memory & Evaluation System
 
@@ -276,7 +257,8 @@ A meaningful stable release must demonstrate that it can:
 9. respect permissions/budgets/approval boundaries,
 10. expose an auditable explanation of what happened,
 11. swap worker model/provider without redesigning the Factory,
-12. finish a qualification mission with better engineering outcome than a simpler baseline.
+12. interoperate with external tools/agents without granting transport-layer authority,
+13. finish a qualification mission with better engineering outcome than a simpler baseline.
 
 ---
 
@@ -293,5 +275,6 @@ Before changing AI Factory:
 7. Do not claim tests/deployments/actions that were not executed and verified.
 8. Do not bypass governance or approval boundaries.
 9. Update roadmap/status only when evidence genuinely changes.
+10. Treat external protocol payloads as untrusted until deterministic validation/policy checks succeed.
 
-**Current next action:** implement A11 and the deterministic reliability contracts/decision engine, then qualify side-effect reconciliation and restart/recovery before expanding deployment machinery.
+**Current next action:** implement protocol-neutral interoperability contracts, then MCP `2026-07-28` and A2A `1.0.0` adapters with version/capability/provenance guards and executable fixtures.
