@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-factory.local/schemas/real-estate-consumer-card.schema.json",
+  "title": "Real Estate Consumer Listing Card Projection",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["canonical_id", "title", "city", "locality", "price_minor", "area_sqm", "freshness_code", "trust_code", "verification_badge", "message_codes"],
+  "properties": {
+    "canonical_id": {"type": "string", "minLength": 1},
+    "title": {"type": "string"},
+    "city": {"type": "string"},
+    "locality": {"type": "string"},
+    "price_minor": {"type": "integer", "minimum": 0},
+    "area_sqm": {"type": "number", "exclusiveMinimum": 0},
+    "bedrooms": {"type": ["integer", "null"], "minimum": 0},
+    "freshness_code": {"enum": ["FRESH", "STALE"]},
+    "trust_code": {"enum": ["UNKNOWN", "EVIDENCE_AVAILABLE", "NEEDS_REVIEW"]},
+    "verification_badge": {"type": "boolean"},
+    "message_codes": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+  }
+}
