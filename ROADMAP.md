@@ -1,16 +1,16 @@
-# AI Factory — Master Roadmap v4
+# AI Factory — Master Roadmap v5
 
 > **Status:** Active build  
-> **Current phase:** Phase 4 — Engineering Pod  
+> **Current phase:** Phase 5 — Assurance Pod  
 > **Architecture:** Hybrid deterministic Control Plane + bounded AI workers  
-> **Next milestone:** Define and execute typed engineering work packages for A05 Frontend, A06 Backend, A07 Database and A08 AI & Automation with isolated write scopes, dependency-aware integration and evidence-backed completion.  
+> **Next milestone:** Make A09 Security, A10 QA/Test and A12 Red Team independently reject and drive correction of unsafe or weak integrated work with typed, evidence-backed findings.  
 > **Repository purpose:** Build a reusable AI-native software organization that can turn product missions into verified software without requiring the human owner to manually coordinate every engineering role.
 
 ---
 
 # 1. North Star
 
-AI Factory is not one website, app, real-estate product or e-commerce product. It is the reusable software-production operating system that receives a mission and coordinates the work required to produce a testable, reviewable release candidate.
+AI Factory is not one website, application, real-estate product or e-commerce product. It is a reusable **software-production operating system** that receives a mission and coordinates the work required to produce a tested, reviewable release candidate.
 
 ```text
 MISSION
@@ -21,15 +21,13 @@ ARCHITECTURE + UX
   ↓
 TASK / DEPENDENCY GRAPH
   ↓
-SPECIALIST EXECUTION
+SPECIALIST ENGINEERING
   ↓
-EVIDENCE + TESTS
+EVIDENCE + INTEGRATION
   ↓
-SECURITY / RED TEAM
+SECURITY / QA / RED TEAM
   ↓
-INTEGRATION
-  ↓
-RELEASE CANDIDATE
+RELIABILITY / RELEASE
   ↓
 HUMAN GATE WHEN REQUIRED
   ↓
@@ -95,6 +93,7 @@ Roles are logical specialists, not necessarily twelve continuously running proce
 - Agent confidence is metadata, not proof.
 - Multi-agent execution is justified by value, not aesthetics.
 - Irreversible or consequential external actions cross the required human/policy gate.
+- Review independence is a runtime property, not an agent-count claim.
 
 ---
 
@@ -136,7 +135,7 @@ Only deterministic runtime code may perform protected state transitions after va
 
 ## Phase 0 — Project Constitution ✅ PASS
 
-Completed: master roadmap, repository entrypoint, initial organization, human-approval principle, evidence-before-completion principle.
+Completed: master roadmap, repository entrypoint, initial organization, human-approval principle and evidence-before-completion principle.
 
 ## Phase 0.5 — Architecture Audit & Factory DNA ✅ PASS
 
@@ -151,88 +150,70 @@ Completed foundation documents:
 
 ## Phase 1 — Control Plane & Orchestrator Foundation ✅ PASS
 
-Completed:
-- A01 Orchestrator contract
-- mission/task/agent/artifact/review/action/evidence/objection/event typed contracts and schemas
-- deterministic task state transitions
-- dependency graph validation and dependency-aware release
-- permission/capability and budget contracts
-- mock Agent Registry
-- orchestration evaluations
-- append-only hash-chained audit ledger
-- replayable in-memory mission runner
-- reviewer independence enforcement
-- dependency/replay sample mission tests
-
-Phase 1 evaluation covers single-worker routing, safe parallelism, write conflicts, blocking security objections, stale downstream work, bounded retries, protected ambiguity, budget exhaustion, malicious retrieved content, unsupported completion rejection and reconcile-before-retry behavior.
+Qualified: A01 contract, typed mission/task/agent/artifact/review/action/evidence/objection/event contracts, deterministic state transitions, dependency validation, permission/budget contracts, audit ledger, replayable mission runner, reviewer-independence checks and orchestration evaluations.
 
 ## Phase 2 — Minimum Local Runtime ✅ PASS
 
-Qualified local runtime includes:
-- Mission Intake
-- persisted Agent Registry
-- persisted Task Graph / mission state
-- durable Event/Audit ledger
-- Artifact Registry
-- Policy Engine v0
-- Budget Manager
-- Approval State Manager
-- workspace isolation abstraction
-- provider adapter interface
-- structured tracing with redaction
-- restart/resume reconciliation tests
+Qualified: Mission Intake, persisted Agent Registry, task/mission persistence, durable local audit ledger, Artifact Registry, Policy Engine v0, Budget Manager, Approval State Manager, workspace abstraction, provider adapter, structured redacted tracing and restart/resume tests.
 
-Exit evidence is recorded in `docs/evaluations/PHASE2_COMPLETION.md`. Phase 2 establishes local transactional durability only; it does not claim distributed or production durability.
+Evidence: `docs/evaluations/PHASE2_COMPLETION.md`.
 
 ## Phase 3 — Design Pod ✅ PASS
 
-Completed and qualified:
-- [x] A02 Product Architect contract
-- [x] A03 System Architect contract
-- [x] A04 UI/UX contract
-- [x] typed `DesignBundle` contracts
-- [x] `schemas/design-bundle.schema.json`
-- [x] deterministic cross-role `DesignBundleValidator`
-- [x] mission-to-product worker interface
-- [x] product-to-architecture worker interface
-- [x] product-to-UX worker interface
-- [x] bounded Design Pod coordinator
-- [x] persisted DesignBundle artifact handoff
-- [x] raw-mission end-to-end design evaluation fixture
-- [x] contradiction/ambiguity evaluation cases
-- [x] bounded role-targeted revision loop
-- [x] downstream regeneration after product revision
-- [x] no-progress and revision-exhaustion protection
+Qualified: A02 Product, A03 System Architecture and A04 UI/UX contracts; typed DesignBundle; deterministic cross-role validation; bounded role-targeted revision; downstream regeneration; ambiguity/contradiction evals; persisted design artifacts.
 
-Exit evidence is recorded in `docs/evaluations/PHASE3_COMPLETION.md`. GitHub Actions passed on qualified commit `7d2a9e85ddfde4ad99a339b944864200be3ee662` (run `32814610369`).
+Evidence: `docs/evaluations/PHASE3_COMPLETION.md`.
 
-Exit criteria satisfied: a raw product idea becomes an internally consistent, traceable and build-ready DesignBundle before coding begins. Every MUST requirement has acceptance coverage and appropriate architecture/UX coverage; invalid cross-role references are rejected automatically.
+## Phase 4 — Engineering Pod ✅ PASS
 
-## Phase 4 — Engineering Pod 🚧 CURRENT
+Qualified:
+- [x] A05 Frontend contract
+- [x] A06 Backend contract
+- [x] A07 Database contract
+- [x] A08 AI & Automation contract
+- [x] typed implementation work-package/evidence/integration contracts and schemas
+- [x] deterministic DesignBundle traceability and MUST ownership checks
+- [x] write-scope/dependency conflict validation
+- [x] isolated workspace/branch assignment model
+- [x] bounded plan and implementation revision loops
+- [x] dependency-aware IntegrationManifest with artifact/path ownership checks
+- [x] persisted engineering evidence and integration artifacts
+- [x] explicit DesignBundle → EngineeringPlan qualification fixture
+- [x] controlled frontend/backend/database working application evaluation
 
-Implement and evaluate:
-- [ ] A05 Frontend contract
-- [ ] A06 Backend contract
-- [ ] A07 Database contract
-- [ ] A08 AI & Automation contract
-- [ ] typed implementation work-package contract/schema
-- [ ] deterministic write-scope/dependency validator
-- [ ] isolated workspace/branch assignment model
-- [ ] evidence manifest for code/test/artifact completion
-- [ ] engineering coordinator with bounded retries/revisions
-- [ ] integration plan and conflict handling
-- [ ] DesignBundle → engineering work packages fixture
-- [ ] controlled-environment integrated application evaluation
+Exit evidence: `docs/evaluations/PHASE4_COMPLETION.md`.
 
-Requirements: isolated workspaces/branches, declared write scopes, test/evidence output, dependency review, explicit artifact ownership and no direct production credentials.
+Qualified head: `4b2bd2d85e05b444f095c716be96b8c7e40ccb27`; GitHub Actions run `32823650154` succeeded.
 
-Exit criteria: Design Pod artifacts can produce an integrated working application in a controlled environment, and no engineering work package can become complete without declared scope, traceability to DesignBundle requirements and executable evidence.
+Exit criteria satisfied for controlled local qualification: Design Pod artifacts can produce an integrated working application, and engineering work cannot qualify without declared scope, DesignBundle traceability and executable evidence.
 
-## Phase 5 — Assurance Pod
+## Phase 5 — Assurance Pod 🚧 CURRENT
 
-Implement and evaluate A09 Security, A10 QA/Test and A12 Red Team/Reviewer. Add executable threat-model test families.
+Goal: make independent reviewers **reject and drive correction** of weak or unsafe integrated work, not merely write critique.
 
-Exit criteria: weak/unsafe work is measurably rejected and corrected rather than merely critiqued.
+Current implementation:
+- [x] typed `AssuranceFinding`, `AssuranceReport` and `AssuranceDecision`
+- [x] A09 Security worker contract
+- [x] A10 QA/Test worker contract
+- [x] A12 Red-Team worker contract
+- [x] deterministic requirement for all three assurance roles
+- [x] reviewer-vs-implementer independence guard
+- [x] HIGH/CRITICAL findings forced to blocking
+- [x] deterministic `PASS` vs `CHANGES_REQUIRED`
+- [x] persisted assurance reports and decision through Artifact Registry
+- [x] machine-readable Assurance schemas
+- [x] executable initial tests for clean pass, security block and independence failure
+
+Remaining Phase 5 work:
+- [ ] executable threat-model test families
+- [ ] acceptance-criterion coverage accounting for A10
+- [ ] adversarial integration-seam scenarios for A12
+- [ ] bounded remediation/re-review loop
+- [ ] stale prior assurance after corrected engineering artifacts
+- [ ] prove blocking findings cannot reach release state
+- [ ] final Phase 5 qualification report and CI evidence
+
+Exit criteria: weak/unsafe work is measurably rejected and corrected; unresolved blocking findings cannot be promoted to release-ready state.
 
 ## Phase 6 — Reliability & Durable Execution
 
@@ -299,4 +280,4 @@ Before changing AI Factory:
 8. Do not bypass governance or approval boundaries.
 9. Update roadmap/status only when evidence genuinely changes.
 
-**Current next action:** define A05–A08 engineering agent contracts and the typed implementation work-package/evidence model, then enforce write-scope and DesignBundle traceability before adding any code-producing worker implementation.
+**Current next action:** implement executable Phase 5 threat/QA/red-team test families and a bounded remediation/re-review loop that invalidates stale assurance after corrected engineering artifacts.
