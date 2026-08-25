@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-factory.local/schemas/external-task-request.schema.json",
+  "title": "ExternalTaskRequest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["request_id", "correlation_id", "mission_id", "kind", "capability_id", "payload", "provenance"],
+  "properties": {
+    "request_id": {"type": "string", "minLength": 1},
+    "correlation_id": {"type": "string", "minLength": 1},
+    "mission_id": {"type": "string", "minLength": 1},
+    "kind": {"enum": ["TOOL_CALL", "AGENT_TASK"]},
+    "capability_id": {"type": "string", "minLength": 1},
+    "payload": {"type": "object"},
+    "idempotency_key": {"type": ["string", "null"], "minLength": 1},
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["protocol", "protocol_version", "endpoint_id", "trust_level"],
+      "properties": {
+        "protocol": {"type": "string", "minLength": 1},
+        "protocol_version": {"type": "string", "minLength": 1},
+        "endpoint_id": {"type": "string", "minLength": 1},
+        "trust_level": {"enum": ["UNTRUSTED_EXTERNAL", "VALIDATED_EXTERNAL"]}
+      }
+    }
+  }
+}
