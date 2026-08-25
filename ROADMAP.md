@@ -1,10 +1,10 @@
-# AI Factory — Master Roadmap v14
+# AI Factory — Master Roadmap v15
 
 > **Status:** Active build  
 > **Current phase:** Phase 10 — Mission 001: Real Estate Intelligence Platform  
-> **Current milestone:** Phase 10-G — SEO & Discovery Surfaces  
+> **Current milestone:** Phase 10-H — Localization & Market Adapters  
 > **Architecture:** Hybrid deterministic Control Plane + bounded AI workers  
-> **Next milestone:** Build deterministic, canonical-data-backed discovery documents, stable public route identities, crawl/index eligibility rules, sitemap projections and structured metadata without publishing stale, unauthorized or review-sensitive claims.  
+> **Next milestone:** Add locale/market adapters that translate deterministic presentation/discovery codes into market-specific formatting and copy without changing canonical prices, rights, lifecycle, trust, search semantics or route identity.  
 > **Repository purpose:** Build a reusable AI-native software organization that can turn product missions into verified software without requiring the human owner to manually coordinate every engineering role.
 
 ---
@@ -113,6 +113,7 @@ Roles are logical specialists, not necessarily twelve continuously running proce
 - In Mission 001, suspicion/anomaly score is evidence for review, never an automatic fraud verdict or trust badge.
 - Presentation/UX layers may explain verified state; they may not create trust, verification, fraud, rights or lifecycle facts.
 - Public discovery/SEO surfaces may expose only index-eligible canonical facts; they cannot resurrect stale/withdrawn inventory or convert review evidence into public allegations.
+- Localization/market adapters may translate and format canonical facts; they may not change numeric value, lifecycle semantics, rights state, trust meaning, identifiers or policy authority.
 
 ---
 
@@ -257,27 +258,35 @@ Qualified executable head: `adfaddda23699bf2113c10878d9728a96d98ab97`; GitHub Ac
 
 Evidence: `docs/evaluations/PHASE10F_COMPLETION.md`.
 
-### Phase 10-G — SEO & Discovery Surfaces 🚧 CURRENT
+### Phase 10-G — SEO & Discovery Surfaces ✅ PASS
 
-Goal: expose search-engine/discovery-friendly public documents derived only from index-eligible canonical inventory, without allowing SEO generation to become a parallel source of domain truth.
+Qualified capabilities include stable canonical public routes, fail-closed lifecycle/freshness/rights index policy, explicit `index,follow`/`noindex,follow` projection, reason codes, bounded plain-text metadata, canonical-state `lastmod`, Schema.org profile/type declaration without invented Offer/currency/trust claims, one discovery URL per canonical duplicate group, stable sitemap projection, duplicate-location protection, XML escaping and a controlled lifecycle-to-noindex qualification.
+
+Qualified executable head: `79fa4e93844eee471584867c1150c86f3cf2b536`; GitHub Actions run `32854864655` succeeded.
+
+Evidence: `docs/evaluations/PHASE10G_COMPLETION.md`.
+
+### Phase 10-H — Localization & Market Adapters 🚧 CURRENT
+
+Goal: localize and format qualified canonical/presentation/discovery data for specific markets without allowing locale code to become a second domain model.
 
 Required baseline:
-- [ ] stable public listing route/canonical URL identity derived from canonical listing ID
-- [ ] deterministic index-eligibility policy that excludes stale, expired, sold/rented/withdrawn or rights-invalid content
-- [ ] canonical listing metadata projection with title/description/location/price and `lastmod` derived from canonical state
-- [ ] structured-data projection with explicit schema version/type and no unsupported trust/fraud claims
-- [ ] sitemap projection containing only index-eligible canonical routes, stable ordering and deterministic `lastmod`
-- [ ] route/metadata escaping and length bounds so listing content cannot inject markup/control metadata
-- [ ] no duplicate source URL surfaces for records collapsed into one canonical listing
-- [ ] noindex explanation codes for ineligible inventory
-- [ ] machine-readable SEO/discovery schemas
-- [ ] regression tests for lifecycle/freshness/rights eligibility, duplicate collapse and stable route identity
-- [ ] controlled discovery qualification proving public documents remain consistent with canonical presentation/domain state
+- [ ] typed `LocaleContext` and market adapter contracts with explicit locale, language, numbering system, currency metadata and directionality
+- [ ] deterministic localized message catalog keyed only by qualified message/status codes
+- [ ] RTL/LTR presentation metadata independent of domain state
+- [ ] amount formatting that requires an explicit currency code and never infers currency from location alone
+- [ ] date/time formatting from timezone-aware canonical timestamps with explicit target timezone
+- [ ] localized number/unit formatting while preserving canonical numeric values
+- [ ] canonical route identity remains locale-independent unless an explicit versioned routing policy says otherwise
+- [ ] localized SEO title/description projection may translate/format display text but cannot change index eligibility, canonical URL, lifecycle or trust semantics
+- [ ] fallback behavior for unknown locale/message code is deterministic and observable
+- [ ] machine-readable locale/market adapter schemas
+- [ ] tests for Persian RTL and English LTR profiles, digits, dates, currencies, fallback and semantic invariance
+- [ ] controlled qualification proving two locale projections of the same listing preserve identical canonical/trust/lifecycle/search meaning
 
-### Later Mission 001 slices
+### Later Mission 001 slice
 
-After 10-G:
-- Phase 10-H Localization/market adapters
+After 10-H:
 - Phase 10-I Domain assurance and bounded full-stack qualification
 
 Opaque ML ranking, identity-document processing, payments, financial products and production deployment remain deferred until the appropriate policy/security/human gates exist.
@@ -308,7 +317,7 @@ A meaningful stable Factory release must demonstrate that it can:
 14. protect evaluation baselines from the worker being evaluated,
 15. finish a qualification mission with a demonstrably justified outcome versus a simpler baseline.
 
-A Mission 001 release candidate additionally requires evidence for source rights/provenance, inventory freshness, duplicate handling, search correctness, trust controls, persistence/recovery and domain assurance.
+A Mission 001 release candidate additionally requires evidence for source rights/provenance, inventory freshness, duplicate handling, search correctness, trust controls, persistence/recovery, safe public discovery, localization invariance and domain assurance.
 
 ---
 
@@ -332,5 +341,6 @@ Before changing AI Factory:
 14. Anomaly findings may queue review but cannot by themselves create a fraud verdict, verification badge or destructive listing action.
 15. Presentation contracts may expose canonical facts and reviewed evidence, but must not become a backdoor for creating protected trust/lifecycle/rights state.
 16. SEO/discovery documents must be projections of canonical index-eligible state, never independent content records.
+17. Localization/market adapters may change display representation only; semantic/canonical invariants must remain identical across locales.
 
-**Current next action:** implement Phase 10-G index eligibility, stable canonical routes and typed listing metadata/sitemap projections, then qualify them against lifecycle/freshness/rights/duplicate invariants.
+**Current next action:** implement Phase 10-H typed locale/market profiles and a deterministic message/number/date/currency formatting layer, then qualify Persian RTL and English LTR projections for semantic invariance.
