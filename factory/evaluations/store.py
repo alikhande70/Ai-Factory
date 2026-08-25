@@ -4,6 +4,8 @@ from dataclasses import asdict
 import json
 import sqlite3
 
+from factory.runtime.secrets import secret_safe_projection
+
 from .contracts import EvaluationBaseline, EvaluationMetrics
 
 
@@ -42,7 +44,7 @@ class SQLiteEvaluationStore:
 
     @staticmethod
     def _dump(value: object) -> str:
-        return json.dumps(value, sort_keys=True, separators=(",", ":"))
+        return json.dumps(secret_safe_projection(value), sort_keys=True, separators=(",", ":"))
 
     def register_baseline(self, baseline: EvaluationBaseline, *, actor_id: str) -> str:
         baseline.validate()
