@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-factory.local/schemas/real-estate-publisher-listing.schema.json",
+  "title": "Real Estate Publisher Listing Projection",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["canonical_id", "listing_id", "source_ref", "rights_basis", "rights_accepted", "state", "missing_disclosures", "allowed_lifecycle_actions", "message_codes"],
+  "properties": {
+    "canonical_id": {"type": "string", "minLength": 1},
+    "listing_id": {"type": "string", "minLength": 1},
+    "source_ref": {"type": "string", "minLength": 1},
+    "rights_basis": {"enum": ["OWNER_SUBMITTED", "PARTNER_FEED", "LICENSED_DATA", "UNAUTHORIZED_SCRAPE"]},
+    "rights_accepted": {"type": "boolean"},
+    "state": {"enum": ["DRAFT", "ACTIVE", "UNDER_OFFER", "SOLD", "RENTED", "WITHDRAWN", "EXPIRED"]},
+    "missing_disclosures": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "allowed_lifecycle_actions": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "message_codes": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+  }
+}
