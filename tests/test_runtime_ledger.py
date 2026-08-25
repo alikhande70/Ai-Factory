@@ -101,6 +101,15 @@ class MissionRunnerTests(unittest.TestCase):
             runner.transition("T-1", TaskState.DONE, actor_id="A01")
         self.assertEqual(runner.ledger.events(), ())
 
+    def test_ledger_failure_does_not_mutate_canonical_state(self):
+        runner = MissionRunner("M-1", ["T-1"])
+        runner.transition("T-1", TaskState.READY, actor_id="A01", event_id="EVT-1")
+        self.assertEqual(runner.tasks["T-1"].state, TaskState.READY)
+        with self.assertRaises(ValueError):
+            runner.transition("T-1", TaskState.IN_PROGRESS, actor_id="A05", event_id="EVT-1")
+        self.assertEqual(runner.tasks["T-1"].state, TaskState.READY)
+        self.assertEqual(len(runner.ledger.events()), 1)
+
     def test_blocking_objection_prevents_verified_and_is_not_logged_as_success(self):
         runner = MissionRunner("M-1", ["T-1"])
         runner.transition("T-1", TaskState.READY, actor_id="A01")
