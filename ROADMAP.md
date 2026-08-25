@@ -1,18 +1,16 @@
-# AI Factory — Master Roadmap v2
+# AI Factory — Master Roadmap v3
 
 > **Status:** Active build  
-> **Current phase:** Phase 2 — Minimum Local Runtime  
+> **Current phase:** Phase 3 — Design Pod  
 > **Architecture:** Hybrid deterministic Control Plane + bounded AI workers  
-> **Next milestone:** Persist mission/task/audit state and prove restart/resume without fabricated completion.  
+> **Next milestone:** Turn a raw product mission into a validated DesignBundle containing requirements, acceptance criteria, architecture decisions and UX flows, then prove cross-role consistency with executable tests.  
 > **Repository purpose:** Build a reusable AI-native software organization that can turn product missions into verified software without requiring the human owner to manually coordinate every engineering role.
 
 ---
 
 # 1. North Star
 
-AI Factory is not one website, app, real-estate product or e-commerce product.
-
-It is the reusable **software-production operating system** that receives a mission and coordinates the work required to produce a testable, reviewable release candidate.
+AI Factory is not one website, app, real-estate product or e-commerce product. It is the reusable software-production operating system that receives a mission and coordinates the work required to produce a testable, reviewable release candidate.
 
 ```text
 MISSION
@@ -44,33 +42,26 @@ Company sentence:
 
 ---
 
-# 2. Final architecture decision
-
-The pre-build audit rejected a free-form autonomous swarm as the core architecture.
+# 2. Locked architecture
 
 The Factory uses:
 
-1. **Deterministic Control Plane** — mission/task state, permissions, budgets, approval state, artifact versions, audit history.
-2. **Probabilistic AI workers** — planning, product reasoning, architecture, code, UX, research and critique.
-3. **Typed communication** — Tasks, Artifacts, Evidence, Reviews, Decisions, Objections, Events and Escalations.
-4. **Versioned shared state** — canonical state is validated and attributable; worker scratch context is separate.
-5. **Independent verification** — objective checks first; specialist and adversarial review where useful.
-6. **Capability-scoped autonomy** — no role has blanket authority.
-7. **Human gates** — protected external, financial, identity-bound, destructive and high-impact actions require human authority unless a narrow policy envelope explicitly allows them.
-8. **Single-worker fast path** — multiple agents are used only when specialization, parallelism, context isolation or independent review adds value.
-9. **Mission Pods** — domain specialists are attached only when a mission needs them.
-10. **Provider independence** — internal schemas/state are canonical; MCP/A2A/provider SDKs are adapters.
+1. **Deterministic Control Plane** for canonical mission/task state, permissions, budgets, approvals, artifact versions and audit history.
+2. **Probabilistic AI workers** for planning, product reasoning, architecture, coding, UX, research and critique.
+3. **Typed communication** through Tasks, Artifacts, Evidence, Reviews, Decisions, Objections, Events and Escalations.
+4. **Versioned shared state** with canonical state separated from disposable worker scratch context.
+5. **Independent verification** using objective checks first and specialist/adversarial review where useful.
+6. **Capability-scoped autonomy** with no blanket role authority.
+7. **Human gates** for protected external, financial, identity-bound, destructive and other high-impact actions.
+8. **Single-worker fast path** when additional agents do not create measurable value.
+9. **Mission Pods** that activate only the specialist roles a mission needs.
+10. **Provider independence**: internal schemas/state remain canonical; MCP/A2A/provider SDKs are adapters.
 
-See:
-
-- `docs/foundation/FINAL_ARCHITECTURE_AUDIT.md`
-- `docs/architecture/decisions/ADR-0001-hybrid-control-plane.md`
+See `docs/foundation/FINAL_ARCHITECTURE_AUDIT.md` and `docs/architecture/decisions/ADR-0001-hybrid-control-plane.md`.
 
 ---
 
-# 3. Core organizational roles
-
-The first stable organization defines 12 reusable roles. These are logical specialists; a mission does not automatically invoke all 12.
+# 3. Core roles
 
 | ID | Role | Primary responsibility |
 |---|---|---|
@@ -87,13 +78,11 @@ The first stable organization defines 12 reusable roles. These are logical speci
 | A11 | DevOps / Reliability | CI/CD, environments, observability, rollback, runtime reliability |
 | A12 | Red Team / Reviewer | Adversarial final critique and weak-completion rejection |
 
-Future roles such as Search, Payments, SEO, Mobile, Analytics, Localization, Compliance and domain specialists are added only when evaluation proves their value.
+Roles are logical specialists, not necessarily twelve continuously running processes.
 
 ---
 
 # 4. Protected design rules
-
-These rules are non-negotiable unless governance explicitly changes them:
 
 - No fake completion.
 - Natural language never grants privilege.
@@ -102,33 +91,26 @@ These rules are non-negotiable unless governance explicitly changes them:
 - Important knowledge belongs in versioned repository/state artifacts.
 - Critical state transitions are deterministic and auditable.
 - Side effects require retry/idempotency/reconciliation design.
-- Security/evaluation gates cannot be disabled simply to make implementation pass.
+- Security/evaluation gates cannot be weakened merely to make implementation pass.
 - Agent confidence is metadata, not proof.
-- Multi-agent execution is justified by value, not by agent-count aesthetics.
+- Multi-agent execution is justified by value, not aesthetics.
 - Irreversible or consequential external actions cross the required human/policy gate.
 
 ---
 
 # 5. Canonical state model
 
-The Factory will maintain three distinct memory/state classes.
+The Factory maintains three distinct state classes:
 
-## Canonical State
-Validated mission facts, tasks, decisions, artifact versions, approvals, evidence and events.
+- **Canonical State:** validated mission facts, tasks, decisions, artifact versions, approvals, evidence and events.
+- **Worker Scratch State:** ephemeral task-local context; disposable and untrusted by default.
+- **Organizational Memory:** reusable lessons/patterns promoted only through review and provenance.
 
-## Worker Scratch State
-Ephemeral task-local working context. Disposable and untrusted by default.
-
-## Organizational Memory
-Reusable lessons/patterns promoted only through review and provenance.
-
-Raw web/tool/user content must never automatically become long-term trusted memory.
+Raw user/web/tool content must never automatically become trusted long-term memory.
 
 ---
 
-# 6. Standard lifecycle states
-
-Initial task lifecycle:
+# 6. Standard lifecycle
 
 ```text
 BACKLOG
@@ -146,284 +128,138 @@ STALE
 AWAITING_HUMAN_APPROVAL
 ```
 
-Only the deterministic runtime may perform protected state transitions after validating required inputs/evidence/policy.
+Only deterministic runtime code may perform protected state transitions after validating policy, evidence and preconditions.
 
 ---
 
 # 7. Build phases
 
-## Phase 0 — Project Constitution ✅
+## Phase 0 — Project Constitution ✅ PASS
 
-Goal: make the project understandable without chat history.
+Completed: master roadmap, repository entrypoint, initial organization, human-approval principle, evidence-before-completion principle.
 
-Completed:
+## Phase 0.5 — Architecture Audit & Factory DNA ✅ PASS
 
-- [x] Master roadmap.
-- [x] Repository entrypoint README.
-- [x] Initial 12-role organization.
-- [x] Human approval principle.
-- [x] Evidence-before-completion principle.
+Completed foundation documents:
+- `FINAL_ARCHITECTURE_AUDIT.md`
+- `MANIFESTO.md`
+- `COMPANY_DNA.md`
+- `GOVERNANCE.md`
+- `AUTONOMY_MODEL.md`
+- `THREAT_MODEL.md`
+- `ADR-0001-hybrid-control-plane.md`
 
-Exit status: **PASS**.
-
----
-
-## Phase 0.5 — Architecture Audit & Factory DNA ✅
-
-Goal: pressure-test the original multi-agent idea before implementation.
+## Phase 1 — Control Plane & Orchestrator Foundation ✅ PASS
 
 Completed:
+- A01 Orchestrator contract
+- mission/task/agent/artifact/review/action/evidence/objection/event typed contracts and schemas
+- deterministic task state transitions
+- dependency graph validation and dependency-aware release
+- permission/capability and budget contracts
+- mock Agent Registry
+- orchestration evaluations
+- append-only hash-chained audit ledger
+- replayable in-memory mission runner
+- reviewer independence enforcement
+- dependency/replay sample mission tests
 
-- [x] `docs/foundation/FINAL_ARCHITECTURE_AUDIT.md`
-- [x] `docs/foundation/MANIFESTO.md`
-- [x] `docs/foundation/COMPANY_DNA.md`
-- [x] `docs/foundation/GOVERNANCE.md`
-- [x] `docs/foundation/AUTONOMY_MODEL.md`
-- [x] `docs/foundation/THREAT_MODEL.md`
-- [x] `docs/architecture/decisions/ADR-0001-hybrid-control-plane.md`
+Phase 1 evaluation covers single-worker routing, safe parallelism, write conflicts, blocking security objections, stale downstream work, bounded retries, protected ambiguity, budget exhaustion, malicious retrieved content, unsupported completion rejection and reconcile-before-retry behavior.
 
-Exit status: **PASS — architecture revised before code lock-in**.
+## Phase 2 — Minimum Local Runtime ✅ PASS
 
----
+Qualified local runtime includes:
+- Mission Intake
+- persisted Agent Registry
+- persisted Task Graph / mission state
+- durable Event/Audit ledger
+- Artifact Registry
+- Policy Engine v0
+- Budget Manager
+- Approval State Manager
+- workspace isolation abstraction
+- provider adapter interface
+- structured tracing with redaction
+- restart/resume reconciliation tests
 
-## Phase 1 — Control Plane & Orchestrator Foundation ✅
+Exit evidence is recorded in `docs/evaluations/PHASE2_COMPLETION.md`. GitHub Actions passed on the qualified Phase 2 commit. Phase 2 establishes local transactional durability only; it does not claim distributed or production durability.
 
-Goal: create the first executable coordination model without building the full worker workforce.
-
-Completed:
-
-- [x] `docs/agents/orchestrator.md`
-- [x] `schemas/mission.schema.json`
-- [x] `schemas/task.schema.json`
-- [x] `schemas/agent.schema.json`
-- [x] `schemas/artifact.schema.json`
-- [x] `schemas/review.schema.json`
-- [x] `schemas/action-proposal.schema.json`
-- [x] typed evidence/objection/event contracts and schemas
-- [x] deterministic task state-transition specification
-- [x] dependency graph validation and dependency-aware release rules
-- [x] capability/permission contract
-- [x] budget contract
-- [x] mock Agent Registry
-- [x] first orchestration evaluation fixtures
-- [x] append-only hash-chained audit ledger
-- [x] replayable in-memory mission runner
-- [x] runtime-enforced worker/reviewer independence
-- [x] end-to-end dependency/replay sample mission test
-
-Required evaluation cases covered:
-
-1. simple task chooses single-worker fast path,
-2. full-stack mission decomposes correctly,
-3. safe parallel work is recognized,
-4. overlapping write scopes are blocked/serialized,
-5. security objection blocks downstream release,
-6. upstream change invalidates stale work,
-7. transient failure retries safely,
-8. protected ambiguity escalates,
-9. budget exhaustion stops gracefully,
-10. malicious retrieved text cannot become authority,
-11. unsupported completion claim is rejected,
-12. timed-out external write is reconciled before retry.
-
-Exit evidence:
-
-- sample missions become valid dependency graphs,
-- invalid state transitions are rejected by code,
-- permissions/budgets exist outside prompts,
-- mock workers execute create → verify → review → done,
-- audit events reproduce state-transition history,
-- reviewer independence is enforced from recorded worker identity,
-- GitHub Actions passed on repository state containing the Phase 1 completion tests.
-
-Exit status: **PASS**.
-
----
-
-## Phase 2 — Minimum Local Runtime 🚧 CURRENT
-
-Goal: run the control plane locally with mocked or simple real workers and durable state.
-
-Deliverables:
-
-- [ ] Mission Intake service/module.
-- [ ] persisted Agent Registry.
-- [ ] persisted Task Graph store.
-- [ ] durable Event/Audit ledger.
-- [ ] Artifact registry.
-- [ ] Policy Engine v0 integration.
-- [ ] Budget manager.
-- [ ] Approval state manager.
-- [ ] workspace isolation abstraction.
-- [ ] model/provider adapter interface.
-- [ ] structured tracing with redaction.
-- [ ] restart/resume reconciliation tests.
-
-Do not adopt distributed infrastructure unless local evaluation shows a real need. Prefer a simple local transactional store first.
-
-Exit criteria: a mission survives restart and can resume from persisted state with no fabricated task completion.
-
----
-
-## Phase 3 — Design Pod
+## Phase 3 — Design Pod 🚧 CURRENT
 
 Implement and evaluate:
+- [x] A02 Product Architect contract
+- [x] A03 System Architect contract
+- [x] A04 UI/UX contract
+- [x] typed `DesignBundle` contracts
+- [x] `schemas/design-bundle.schema.json`
+- [x] deterministic cross-role `DesignBundleValidator`
+- [x] initial consistency tests
+- [ ] mission-to-product worker interface
+- [ ] product-to-architecture worker interface
+- [ ] product-to-UX worker interface
+- [ ] bounded Design Pod coordinator
+- [ ] persisted DesignBundle artifact handoff
+- [ ] raw-mission end-to-end design evaluation fixture
+- [ ] contradiction/ambiguity evaluation cases
 
-- [ ] A02 Product Architect
-- [ ] A03 System Architect
-- [ ] A04 UI/UX
+Required outputs:
+- product summary / PRD-level definition,
+- goals and non-goals,
+- prioritized requirements,
+- acceptance criteria with verification methods,
+- architecture decisions and data/API boundaries,
+- UX flows and accessibility constraints,
+- assumptions and risks.
 
-Outputs:
-
-- PRD,
-- user journeys,
-- acceptance criteria,
-- architecture plan,
-- data/API boundaries,
-- ADRs,
-- UX flows.
-
-Exit criteria: a raw product idea becomes an internally consistent build plan before coding starts.
-
----
+Exit criteria: a raw product idea becomes an internally consistent, traceable and build-ready DesignBundle before coding begins. Every MUST requirement has acceptance coverage and appropriate architecture/UX coverage; invalid cross-role references are rejected automatically.
 
 ## Phase 4 — Engineering Pod
 
-Implement and evaluate:
+Implement and evaluate A05 Frontend, A06 Backend, A07 Database and A08 AI & Automation.
 
-- [ ] A05 Frontend
-- [ ] A06 Backend
-- [ ] A07 Database
-- [ ] A08 AI & Automation
-
-Requirements:
-
-- isolated workspaces/branches,
-- declared write scopes,
-- test/evidence output,
-- dependency review,
-- no direct production credentials.
+Requirements: isolated workspaces/branches, declared write scopes, test/evidence output, dependency review and no direct production credentials.
 
 Exit criteria: Design Pod artifacts can produce an integrated working application in a controlled environment.
 
----
-
 ## Phase 5 — Assurance Pod
 
-Implement and evaluate:
+Implement and evaluate A09 Security, A10 QA/Test and A12 Red Team/Reviewer. Add executable threat-model test families.
 
-- [ ] A09 Security
-- [ ] A10 QA & Test
-- [ ] A12 Red Team / Reviewer
-
-Add executable test families from `docs/foundation/THREAT_MODEL.md`.
-
-Exit criteria: weak/unsafe work is measurably rejected and corrected rather than merely critiqued in prose.
-
----
+Exit criteria: weak/unsafe work is measurably rejected and corrected rather than merely critiqued.
 
 ## Phase 6 — Reliability & Durable Execution
 
-Implement A11 DevOps/Reliability and harden long-running execution.
+Implement A11 DevOps/Reliability and harden long-running execution: resumable workflows, bounded retries, idempotency/reconciliation, timeouts/circuit breakers, CI/CD, logging/metrics/traces, preview environments and rollback strategy.
 
-Capabilities:
-
-- [ ] resumable workflows,
-- [ ] bounded retries,
-- [ ] idempotency/reconciliation,
-- [ ] timeouts/circuit breakers,
-- [ ] CI/CD,
-- [ ] logging/metrics/traces,
-- [ ] preview environments,
-- [ ] rollback strategy.
-
-A durable workflow engine may be adopted behind an abstraction after benchmark comparison; it is not hard-coded into the architecture today.
-
----
+A durable workflow engine may be adopted only behind an abstraction after benchmark comparison.
 
 ## Phase 7 — Interoperability
 
-Add adapters where useful:
-
-- [ ] MCP tool/context adapters,
-- [ ] A2A external agent adapter,
-- [ ] provider-specific agent SDK adapters,
-- [ ] sandbox provider adapters.
-
-Internal Factory schemas remain canonical.
-
----
+Add MCP tool/context adapters, A2A external-agent adapter, provider-specific agent SDK adapters and sandbox-provider adapters where useful. Internal schemas remain canonical.
 
 ## Phase 8 — Organizational Memory & Evaluation System
 
-Deliverables:
+Deliver lesson promotion, memory provenance/integrity, regression corpus, benchmark dashboard, model-router evaluation, false-completion metric, cost/latency/quality metrics and protected evaluation baselines.
 
-- [ ] lesson promotion protocol,
-- [ ] memory provenance/integrity,
-- [ ] regression corpus,
-- [ ] model/agent benchmark dashboard,
-- [ ] model-router evaluation,
-- [ ] false-completion metric,
-- [ ] cost/latency/quality metrics,
-- [ ] protected evaluation baselines.
-
-Self-improvement may propose changes; it may not silently rewrite its evaluator or governance.
-
----
+Self-improvement may propose changes; it may not silently rewrite governance or its evaluator.
 
 ## Phase 9 — Factory Qualification Mission
 
-Before the real-estate product, run at least one bounded evaluation application whose objective is to test the Factory itself.
+Run at least one bounded evaluation application exercising product planning, full-stack implementation, migration, security findings, QA regression, parallel work, failure/retry, approval gate and persisted/replayed state.
 
-The mission must exercise:
-
-- product planning,
-- full-stack implementation,
-- database migration,
-- security findings,
-- QA regression,
-- parallel work,
-- failure/retry,
-- approval gate,
-- persisted/replayed state.
-
-Exit criteria: compare Factory execution against a simpler baseline and prove multi-agent/control-plane complexity earns its cost.
-
----
+Exit criteria: compare Factory execution against a simpler baseline and prove the added control-plane/multi-agent complexity earns its cost.
 
 ## Phase 10 — Mission 001: Real Estate Intelligence Platform
 
-Only after Factory qualification, create the real-estate mission.
-
-Likely mission-specific Pod roles may include:
-
-- Real Estate Domain Specialist,
-- Search/Ranking Specialist,
-- SEO Specialist,
-- Fraud/Trust Specialist,
-- Data Acquisition/Partnership Specialist.
-
-The product must not depend on unauthorized copying/republication of third-party listings. Data acquisition must use permitted sources, partnerships, owner/agent submissions or other lawful mechanisms.
-
----
+Only after Factory qualification. Mission-specific roles may include Real Estate Domain, Search/Ranking, SEO, Fraud/Trust and Data Acquisition specialists. The product must not depend on unauthorized copying/republication of third-party listings.
 
 ## Phase 11 — Production Hardening
 
-- [ ] multi-mission isolation,
-- [ ] stronger identity/capability boundaries,
-- [ ] secret management,
-- [ ] audit retention,
-- [ ] backup/restore,
-- [ ] incident response,
-- [ ] scale/performance testing,
-- [ ] dependency/SBOM controls,
-- [ ] production SLOs.
+Add multi-mission isolation, stronger identity/capability boundaries, secret management, audit retention, backup/restore, incident response, performance/scale testing, dependency/SBOM controls and production SLOs.
 
 ---
 
-# 8. Definition of Done for the Factory
-
-AI Factory is not “done” because 12 prompts exist.
+# 8. Definition of Done
 
 A meaningful stable release must demonstrate that it can:
 
@@ -446,15 +282,14 @@ A meaningful stable release must demonstrate that it can:
 
 Before changing AI Factory:
 
-1. Read `README.md`.
-2. Read this `ROADMAP.md`.
-3. Read foundation documents relevant to the change.
-4. Inspect repository state; do not rely on chat memory alone.
-5. Identify the current phase and its exit criteria.
-6. Prefer completing the current milestone over starting unrelated features.
-7. Record material architecture decisions in ADRs.
-8. Do not claim tests/deployments/actions that were not executed and verified.
-9. Do not bypass governance or approval boundaries.
-10. Update roadmap/status when a phase's evidence genuinely changes.
+1. Read `README.md` and this `ROADMAP.md`.
+2. Read relevant foundation/architecture/agent documents.
+3. Inspect repository state; never rely only on chat memory.
+4. Identify the current phase and exit criteria.
+5. Prefer completing the current milestone over unrelated work.
+6. Record material architecture decisions in ADRs.
+7. Do not claim tests/deployments/actions that were not executed and verified.
+8. Do not bypass governance or approval boundaries.
+9. Update roadmap/status only when evidence genuinely changes.
 
-**Current next action:** implement the Phase 2 local persistence boundary (mission/task/audit storage), then prove restart/resume and state reconciliation with automated tests before adding provider adapters.
+**Current next action:** implement the three Design Pod worker interfaces and a bounded coordinator that converts a raw mission into a persisted, validator-approved DesignBundle, then add end-to-end and contradiction evaluation fixtures.
