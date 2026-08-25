@@ -34,6 +34,33 @@ class BoundedInteroperabilityGateway:
                 payload=payload,
             )
 
+    @staticmethod
+    def _unique_capabilities(capabilities: list[ExternalCapability]) -> tuple[ExternalCapability, ...]:
+        ids = [item.capability_id for item in capabilities]
+        if len(ids) != len(set(ids)):
+            raise ValueError("duplicate external capability IDs discovered")
+        return tuple(capabilities)
+
+    def discover_mcp(
+        self,
+        *,
+        adapter: MCPAdapter,
+        transport: InteropTransport,
+    ) -> tuple[ExternalCapability, ...]:
+        descriptors = transport.discover()
+        capabilities = [adapter.discover_tool(item) for item in descriptors]
+        return self._unique_capabilities(capabilities)
+
+    def discover_a2a(
+        self,
+        *,
+        adapter: A2AAdapter,
+        transport: InteropTransport,
+    ) -> tuple[ExternalCapability, ...]:
+        descriptors = transport.discover()
+        capabilities = [adapter.discover_skill(item) for item in descriptors]
+        return self._unique_capabilities(capabilities)
+
     def call_mcp(
         self,
         *,
