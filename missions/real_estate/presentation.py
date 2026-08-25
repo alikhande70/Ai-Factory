@@ -13,6 +13,13 @@ from .inventory import SQLiteInventoryStore
 from .review_queue import ReviewCase, ReviewStatus, SQLiteTrustReviewStore
 
 
+_ALLOWED_RIGHTS = {
+    RightsBasis.OWNER_SUBMITTED,
+    RightsBasis.PARTNER_FEED,
+    RightsBasis.LICENSED_DATA,
+}
+
+
 class FreshnessPresentation(str, Enum):
     FRESH = "FRESH"
     STALE = "STALE"
@@ -52,6 +59,18 @@ class ConsumerListingProjection:
     trust_code: TrustPresentation
     verification_badge: bool
     message_codes: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class PublisherSubmissionProjection:
+    listing_id: str
+    source_ref: str
+    rights_basis: str
+    rights_accepted: bool
+    submitted_state: str
+    missing_disclosures: tuple[str, ...]
+    allowed_lifecycle_actions: tuple[str, ...]
+    blocking_codes: tuple[str, ...]
 
 
 @dataclass(frozen=True)
@@ -130,14 +149,11 @@ class RealEstatePresentationService:
             messages.append("LISTING_STALE")
         if disclosure < 1.0:
             messages.append("DISCLOSURE_INCOMPLETE")
-
         if self._has_active_high_impact_review(canonical_id):
-            # Public-safe language: a review exists; no allegation is emitted.
             trust_code = TrustPresentation.NEEDS_REVIEW
             messages.append("TRUST_REVIEW_PENDING")
 
-        # Current domain model stores evidence-backed trust score but has no explicit
-        # verification-badge grant. Score thresholds must never manufacture a badge.
+        # Trust score/evidence is not an explicit verification-badge grant.
         verification_badge = False
         if trust_evidence is not None:
             messages.append("TRUST_EVIDENCE_AVAILABLE")
@@ -161,17 +177,37 @@ class RealEstatePresentationService:
             message_codes=tuple(messages),
         )
 
+    @staticmethod
+    def publisher_submission(candidate: ListingCandidate) -> PublisherSubmissionProjection:
+        candidate.validate()
+        rights_accepted = candidate.rights_basis in _ALLOWED_RIGHTS
+        missing = RealEstatePresentationService._candidate_missing_disclosures(candidate)
+        blockers: list[str] = []
+        if not rights_accepted:
+            blockers.append("RIGHTS_BASIS_REJECTED")
+        if missing:
+            blockers.append("DISCLOSURE_ACTION_REQUIRED")
+        actions = () if not rights_accepted else tuple(
+            item.value for item in allowed_listing_transitions(candidate.state)
+        )
+        return PublisherSubmissionProjection(
+            listing_id=candidate.listing_id,
+            source_ref=candidate.source_ref,
+            rights_basis=candidate.rights_basis.value,
+            rights_accepted=rights_accepted,
+            submitted_state=candidate.state.value,
+            missing_disclosures=missing,
+            allowed_lifecycle_actions=actions,
+            blocking_codes=tuple(blockers),
+        )
+
     def publisher_listing(self, canonical_id: str) -> PublisherListingProjection:
         canonical = self._inventory.canonical(canonical_id)
         source = self._inventory.source_record(str(canonical["active_source_version_id"]))
         state = ListingState(str(canonical["state"]))
         rights = RightsBasis(str(source["rights_basis"]))
         missing = self._missing_disclosures(source)
-        rights_accepted = rights in {
-            RightsBasis.OWNER_SUBMITTED,
-            RightsBasis.PARTNER_FEED,
-            RightsBasis.LICENSED_DATA,
-        }
+        rights_accepted = rights in _ALLOWED_RIGHTS
         messages: list[str] = []
         if not rights_accepted:
             messages.append("RIGHTS_BASIS_REJECTED")
@@ -192,13 +228,10 @@ class RealEstatePresentationService:
 
     @staticmethod
     def alert_status(event: AlertEvent) -> AlertStatusProjection:
-        # Only a future delivery subsystem with durable provider evidence may emit an
-        # external-delivery-confirmed state. The current outbox is internal evidence.
         if event.status == "PENDING_INTERNAL":
             delivery = DeliveryPresentation.INTERNAL_EVENT_ONLY
             messages = ("ALERT_NOT_EXTERNALLY_DELIVERED",)
         else:
-            # Unknown statuses are not upgraded into a delivery claim.
             delivery = DeliveryPresentation.INTERNAL_EVENT_ONLY
             messages = ("ALERT_DELIVERY_UNVERIFIED",)
         return AlertStatusProjection(
@@ -245,20 +278,32 @@ class RealEstatePresentationService:
         return False
 
     @staticmethod
-    def _missing_disclosures(source: dict[str, object]) -> tuple[str, ...]:
+    def _candidate_missing_disclosures(candidate: ListingCandidate) -> tuple[str, ...]:
         missing: list[str] = []
-        for key in ("title", "description", "city", "locality", "geo_cell"):
-            if not str(source[key]).strip():
-                missing.append(key.upper())
-        if int(source["price_minor"]) <= 0:
+        for key, value in (
+            ("TITLE", candidate.title),
+            ("DESCRIPTION", candidate.description),
+            ("CITY", candidate.city),
+            ("LOCALITY", candidate.locality),
+            ("GEO_CELL", candidate.geo_cell),
+        ):
+            if not value.strip():
+                missing.append(key)
+        if candidate.price_minor <= 0:
             missing.append("PRICE")
-        if float(source["area_sqm"]) <= 0:
-            missing.append("AREA")
-        if source["bedrooms"] is None:
+        if candidate.bedrooms is None:
             missing.append("BEDROOMS")
-        if len(tuple(json.loads(str(source["image_hashes_json"])))) < 3:
+        if len(candidate.image_hashes) < 3:
             missing.append("IMAGES")
         return tuple(missing)
+
+    @staticmethod
+    def _missing_disclosures(source: dict[str, object]) -> tuple[str, ...]:
+        return RealEstatePresentationService._candidate_missing_disclosures(
+            RealEstatePresentationService._candidate(
+                source, ListingState(str(source["submitted_state"]))
+            )
+        )
 
     @staticmethod
     def _candidate(source: dict[str, object], state: ListingState) -> ListingCandidate:
