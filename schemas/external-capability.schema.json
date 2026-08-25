@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-factory.local/schemas/external-capability.schema.json",
+  "title": "ExternalCapability",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["capability_id", "name", "effect_class", "required_factory_capability", "provenance"],
+  "properties": {
+    "capability_id": {"type": "string", "minLength": 1},
+    "name": {"type": "string", "minLength": 1},
+    "effect_class": {"enum": ["READ_ONLY", "LOCAL_WRITE", "EXTERNAL_WRITE"]},
+    "required_factory_capability": {"type": "string", "minLength": 1},
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["protocol", "protocol_version", "endpoint_id", "trust_level"],
+      "properties": {
+        "protocol": {"type": "string", "minLength": 1},
+        "protocol_version": {"type": "string", "minLength": 1},
+        "endpoint_id": {"type": "string", "minLength": 1},
+        "trust_level": {"enum": ["UNTRUSTED_EXTERNAL", "VALIDATED_EXTERNAL"]}
+      }
+    }
+  }
+}
