@@ -1,8 +1,8 @@
 # Phase 11 — Production Hardening Progress
 
 **Status:** In progress  
-**Qualified slices:** multi-mission isolation; verified SQLite backup/restore; scoped secret-reference handling; verifiable non-destructive audit archival; durable incident response; deterministic supply-chain/SBOM controls  
-**Not yet complete:** scale/performance qualification, production SLOs, repository protection verification, external production infrastructure qualification.
+**Qualified slices:** multi-mission isolation; verified SQLite backup/restore; scoped secret-reference handling; verifiable non-destructive audit archival; durable incident response; deterministic supply-chain/SBOM controls; deterministic SLO evidence contracts  
+**Not yet complete:** representative scale/performance qualification, production SLO observation, repository protection enforcement, external production infrastructure qualification.
 
 ## 1. Multi-mission isolation
 
@@ -80,7 +80,7 @@ This does not execute real production containment actions; such actions remain b
 
 ## 6. Deterministic supply-chain inventory and SBOM controls
 
-Phase 11 now includes `factory/reliability/supply_chain.py` and `schemas/sbom.schema.json`.
+Phase 11 includes `factory/reliability/supply_chain.py` and `schemas/sbom.schema.json`.
 
 Implemented controls:
 
@@ -100,7 +100,36 @@ GitHub Actions run: `32869793898` — **success**.
 
 The pinned action revisions work in the current CI environment, but action-runtime maintenance remains ongoing; a SHA pin provides immutability, not permanent support guarantees.
 
-## 7. Boundaries not yet claimed
+## 7. Deterministic SLO evidence contracts
+
+Phase 11 includes `factory/reliability/slo.py` and `schemas/slo-evidence.schema.json`.
+
+Implemented guarantees:
+
+- a typed SLO declares an operation, maximum p95 latency, maximum error rate, minimum throughput and minimum sample count;
+- invalid/NaN latency and invalid durations fail closed;
+- observations from a different operation cannot be mixed into an objective;
+- p95 uses a deterministic nearest-rank calculation;
+- insufficient sample sets cannot qualify even if their measured latency looks good;
+- error budget is calculated explicitly and may become negative when the budget is exceeded;
+- evidence records its environment (`LOCAL`, `CI`, `STAGING`, `PRODUCTION`);
+- local/CI/staging evidence is permanently marked `NON_PRODUCTION_QUALIFICATION_ONLY` and raises if code attempts to present it as production-SLO proof;
+- production evidence may only be claimed when both the environment is explicitly production and the complete objective qualifies.
+
+Qualified head: `03487733f3215c5a76a82b403a0a12c29a0d1ac7`  
+GitHub Actions run: `32870015401` — **success**.
+
+This slice qualifies the **measurement/claim boundary**, not production performance. No production SLO achievement is claimed.
+
+## 8. Repository-governance verification
+
+A direct GitHub branch read on the current repository still reports `main` as **unprotected** and required status-check enforcement as off. This is now verified external state rather than an assumption.
+
+Current classification: `GITHUB_MAIN_PROTECTION = NOT_ENABLED`.
+
+The available connector in this build exposes branch-protection reads but not a branch-protection write action, so this run cannot truthfully claim to enable the repository rule. The software/CI side is prepared for exact required checks, but GitHub account-level enforcement remains an external governance task.
+
+## 9. Boundaries not yet claimed
 
 Production hardening still does **not** claim:
 
@@ -110,13 +139,13 @@ Production hardening still does **not** claim:
 - live production secret-provider integration,
 - destructive audit compaction,
 - real production incident execution,
-- complete load/scale qualification,
+- representative high-load/scale qualification,
 - production SLO compliance,
-- externally verified GitHub branch/review protection,
+- GitHub branch/review protection enforcement,
 - production deployment.
 
 External infrastructure/account actions remain subject to policy and human approval where required.
 
-## 8. Next recommended hardening slice
+## 10. Next recommended hardening slice
 
-Build a deterministic **performance/SLO qualification layer** that separates measured local baselines from production claims. Define typed service-level objectives, collect bounded latency/error/throughput samples for core deterministic paths, reject invalid or insufficient samples, calculate percentile/error-budget evidence reproducibly, and ensure no local benchmark can be presented as a production SLO achievement.
+Add a **representative local/CI scale qualification harness** for the deterministic core: multi-mission catalog isolation, append-only ledger throughput, artifact persistence/reload and Mission 001 canonical search. Persist environment fingerprint + operation counts + latency samples, feed them into the SLO evidence contract as non-production evidence, and keep thresholds broad enough to detect regressions without pretending CI timing is a production capacity benchmark.
