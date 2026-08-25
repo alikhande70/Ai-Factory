@@ -1,0 +1,62 @@
+{
+  "fixture_id": "MISSION001-SEARCH-RELEVANCE-V1",
+  "purpose": "Protected deterministic relevance baseline before any opaque ML ranking is introduced.",
+  "fixed_now": "2026-08-25T12:00:00+00:00",
+  "publisher_trust": 0.8,
+  "listings": [
+    {
+      "id": "PARK-PREMIUM",
+      "title": "Modern park apartment",
+      "description": "Bright two bedroom home with balcony",
+      "locality": "Mitte",
+      "geo_cell": "DE-BE-REL-001",
+      "image_hash": "rel-001"
+    },
+    {
+      "id": "PARK-DESC",
+      "title": "Modern apartment",
+      "description": "Quiet home beside a large park",
+      "locality": "Mitte",
+      "geo_cell": "DE-BE-REL-002",
+      "image_hash": "rel-002"
+    },
+    {
+      "id": "MITTE-APARTMENT",
+      "title": "Central apartment",
+      "description": "Renovated city home",
+      "locality": "Mitte",
+      "geo_cell": "DE-BE-REL-003",
+      "image_hash": "rel-003"
+    },
+    {
+      "id": "KREUZBERG-LOFT",
+      "title": "Industrial loft",
+      "description": "Open plan apartment near cafes",
+      "locality": "Kreuzberg",
+      "geo_cell": "DE-BE-REL-004",
+      "image_hash": "rel-004"
+    },
+    {
+      "id": "WAREHOUSE",
+      "title": "Warehouse investment",
+      "description": "Commercial property with loading bay",
+      "locality": "Neukolln",
+      "geo_cell": "DE-BE-REL-005",
+      "image_hash": "rel-005"
+    }
+  ],
+  "queries": [
+    {
+      "text": "park apartment",
+      "expected_order": ["PARK-PREMIUM", "PARK-DESC", "MITTE-APARTMENT", "KREUZBERG-LOFT"]
+    },
+    {
+      "text": "kreuzberg apartment",
+      "expected_order": ["KREUZBERG-LOFT", "PARK-PREMIUM", "PARK-DESC", "MITTE-APARTMENT"]
+    },
+    {
+      "text": "warehouse",
+      "expected_order": ["WAREHOUSE"]
+    }
+  ]
+}
