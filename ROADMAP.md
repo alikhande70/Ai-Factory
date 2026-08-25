@@ -1,10 +1,10 @@
-# AI Factory — Master Roadmap v12
+# AI Factory — Master Roadmap v13
 
 > **Status:** Active build  
 > **Current phase:** Phase 10 — Mission 001: Real Estate Intelligence Platform  
-> **Current milestone:** Phase 10-E — Trust/Fraud Review Queue & Anomaly Evidence  
+> **Current milestone:** Phase 10-F — Publisher/Consumer UX Contracts & Safe Trust Presentation  
 > **Architecture:** Hybrid deterministic Control Plane + bounded AI workers  
-> **Next milestone:** Build evidence-preserving anomaly findings, a durable operator review queue, independent trust decisions and tests proving suspicion cannot silently become a fraud verdict.  
+> **Next milestone:** Build typed consumer/publisher presentation contracts and flows that expose freshness, provenance, disclosure quality and review-safe trust signals without leaking unverified fraud claims or granting presentation code domain authority.  
 > **Repository purpose:** Build a reusable AI-native software organization that can turn product missions into verified software without requiring the human owner to manually coordinate every engineering role.
 
 ---
@@ -111,6 +111,7 @@ Roles are logical specialists, not necessarily twelve continuously running proce
 - Self-improvement may propose changes; it cannot silently rewrite governance, protected evals or its own evaluator.
 - Domain missions may extend contracts but may not weaken the reusable Factory governance boundary.
 - In Mission 001, suspicion/anomaly score is evidence for review, never an automatic fraud verdict or trust badge.
+- Presentation/UX layers may explain verified state; they may not create trust, verification, fraud, rights or lifecycle facts.
 
 ---
 
@@ -237,27 +238,36 @@ Qualified executable head: `c181c9074953a3e6e1a349f82d27ec56da19f12a`; GitHub Ac
 
 Evidence: `docs/evaluations/PHASE10D_COMPLETION.md` and `docs/missions/REAL_ESTATE_ALERTS.md`.
 
-### Phase 10-E — Trust/Fraud Review Queue & Anomaly Evidence 🚧 CURRENT
+### Phase 10-E — Trust/Fraud Review Queue & Anomaly Evidence ✅ PASS
 
-Goal: detect suspicious inventory patterns without converting probabilistic suspicion into an automatic accusation or trust decision.
+Qualified capabilities include typed evidence-preserving anomaly findings, deterministic price-divergence detection, append-audited SQLite review cases, explicit review lifecycle, reviewer independence for high-impact findings, evidence-required resolution, restart/idempotency, stale-evidence rejection and tamper detection.
+
+A confirmed anomaly is deliberately **not** a fraud verdict, trust-score change, verification-badge decision or destructive listing action.
+
+Qualified executable head: `e7d146938ec2e6b0ec7c52270585e3f68cf57503`; GitHub Actions run `32853146984` succeeded.
+
+Evidence: `docs/evaluations/PHASE10E_COMPLETION.md` and `docs/missions/REAL_ESTATE_TRUST.md`.
+
+### Phase 10-F — Publisher/Consumer UX Contracts & Safe Trust Presentation 🚧 CURRENT
+
+Goal: turn canonical inventory/search/alert/trust state into clear consumer, publisher and operator-facing contracts without allowing the presentation layer to invent domain truth or overstate trust.
 
 Required baseline:
-- [ ] typed anomaly finding with severity, evidence references, detector identity and affected canonical/source IDs
-- [ ] deterministic detector baseline for inspectable anomalies
-- [ ] persisted append-audited review queue
-- [ ] explicit `OPEN / IN_REVIEW / RESOLVED / DISMISSED` review lifecycle
-- [ ] reviewer identity distinct from detector for high-impact trust decisions
-- [ ] evidence required for resolution/trust-impact action
-- [ ] no automatic deletion or fraud label from anomaly score alone
-- [ ] duplicate/anomaly evidence preserved across restart
-- [ ] machine-readable anomaly/review schemas
-- [ ] tests for false-positive safe handling, replay/idempotency and stale evidence
-- [ ] controlled qualification report
+- [ ] typed consumer listing card/detail projections built only from canonical data
+- [ ] explicit freshness, disclosure-quality and provenance presentation fields
+- [ ] safe trust language that distinguishes verified evidence, unknown state and `NEEDS_REVIEW` without emitting an unverified fraud accusation
+- [ ] no verification badge unless evidence-backed publisher trust state explicitly supports it
+- [ ] publisher submission/validation projection showing rights basis, missing disclosure fields and permitted lifecycle actions
+- [ ] saved-search/alert projection that distinguishes internal event creation from external delivery
+- [ ] operator review projection exposing finding evidence, status and stale/current state without domain mutation
+- [ ] deterministic message/status codes separated from localized display strings
+- [ ] machine-readable consumer/publisher/operator presentation schemas
+- [ ] tests proving presentation cannot mutate inventory/trust state or manufacture protected claims
+- [ ] controlled end-to-end UX contract qualification
 
 ### Later Mission 001 slices
 
-After 10-E:
-- Phase 10-F Publisher/Consumer UX flows
+After 10-F:
 - Phase 10-G SEO/discovery surfaces
 - Phase 10-H Localization/market adapters
 - Phase 10-I Domain assurance and bounded full-stack qualification
@@ -311,6 +321,7 @@ Before changing AI Factory:
 11. Do not weaken benchmarks/evaluators to make a worker pass.
 12. Keep mission-specific code outside the reusable Factory core unless a reusable abstraction is proven.
 13. For Mission 001, reject ingestion without an allowed rights basis and never equate model confidence with trust/verification evidence.
-14. For Phase 10-E, anomaly findings may queue review but cannot by themselves create a fraud verdict, verification badge or destructive listing action.
+14. Anomaly findings may queue review but cannot by themselves create a fraud verdict, verification badge or destructive listing action.
+15. Presentation contracts may expose canonical facts and reviewed evidence, but must not become a backdoor for creating protected trust/lifecycle/rights state.
 
-**Current next action:** implement the Phase 10-E anomaly contracts and durable review queue, then qualify independent evidence-based resolution before any automated trust-impact action is considered.
+**Current next action:** implement Phase 10-F typed consumer/publisher/operator presentation contracts and tests, beginning with safe trust-state projection and listing-detail provenance/freshness disclosure.
