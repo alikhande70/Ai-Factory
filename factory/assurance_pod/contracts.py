@@ -8,6 +8,18 @@ ASSURANCE_SEVERITIES = frozenset({"INFO", "LOW", "MEDIUM", "HIGH", "CRITICAL"})
 
 
 @dataclass(frozen=True)
+class AcceptanceCoverage:
+    criterion_id: str
+    evidence_refs: tuple[str, ...]
+
+    def validate(self) -> None:
+        if not self.criterion_id.strip():
+            raise ValueError("criterion_id is required")
+        if not self.evidence_refs or any(not ref.strip() for ref in self.evidence_refs):
+            raise ValueError("acceptance coverage requires non-empty evidence_refs")
+
+
+@dataclass(frozen=True)
 class AssuranceFinding:
     finding_id: str
     category: str
@@ -39,6 +51,7 @@ class AssuranceReport:
     subject_artifact_ref: str
     findings: tuple[AssuranceFinding, ...]
     verification_refs: tuple[str, ...]
+    acceptance_coverage: tuple[AcceptanceCoverage, ...] = ()
 
     def validate(self) -> None:
         if not self.report_id or not self.mission_id or not self.subject_artifact_ref.strip():
@@ -52,6 +65,13 @@ class AssuranceReport:
             raise ValueError("duplicate finding IDs are not allowed")
         for finding in self.findings:
             finding.validate()
+        coverage_ids = [item.criterion_id for item in self.acceptance_coverage]
+        if len(coverage_ids) != len(set(coverage_ids)):
+            raise ValueError("duplicate acceptance criterion coverage is not allowed")
+        for coverage in self.acceptance_coverage:
+            coverage.validate()
+        if self.reviewer_agent != "A10-QA" and self.acceptance_coverage:
+            raise ValueError("only A10-QA may claim acceptance criterion coverage")
 
 
 @dataclass(frozen=True)
