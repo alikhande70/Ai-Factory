@@ -52,6 +52,16 @@ def ensure_ingestion_allowed(candidate: ListingCandidate) -> None:
         raise PermissionError(f"ingestion rights basis is not allowed: {candidate.rights_basis.value}")
 
 
+def allowed_listing_transitions(current: ListingState) -> tuple[ListingState, ...]:
+    """Return the canonical lifecycle actions available from a state.
+
+    Presentation code may expose these actions but must never invent additional
+    transitions. The returned ordering is deterministic for stable UX contracts.
+    """
+
+    return tuple(sorted(_ALLOWED_TRANSITIONS[current], key=lambda state: state.value))
+
+
 def transition_listing_state(current: ListingState, target: ListingState) -> ListingState:
     if target == current:
         return current
