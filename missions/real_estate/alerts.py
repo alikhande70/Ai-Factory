@@ -49,7 +49,8 @@ class SQLiteSavedSearchStore:
 
     This store never sends email, SMS, push or any other external message. External
     delivery belongs behind the Factory tool/policy/approval boundary. The outbox is
-    only canonical evidence that a newly qualifying listing was detected once.
+    only canonical evidence that a newly qualifying listing was detected once for a
+    particular saved-query version.
     """
 
     SCHEMA_VERSION = 1
@@ -92,10 +93,10 @@ class SQLiteSavedSearchStore:
 
                     CREATE TABLE alert_matches (
                         saved_search_id TEXT NOT NULL REFERENCES saved_searches(saved_search_id),
+                        saved_search_version INTEGER NOT NULL,
                         canonical_id TEXT NOT NULL,
-                        first_matched_version INTEGER NOT NULL,
                         first_matched_at TEXT NOT NULL,
-                        PRIMARY KEY(saved_search_id, canonical_id)
+                        PRIMARY KEY(saved_search_id, saved_search_version, canonical_id)
                     );
 
                     CREATE TABLE alert_outbox (
@@ -106,7 +107,7 @@ class SQLiteSavedSearchStore:
                         owner_id TEXT NOT NULL,
                         status TEXT NOT NULL,
                         created_at TEXT NOT NULL,
-                        UNIQUE(saved_search_id, canonical_id)
+                        UNIQUE(saved_search_id, saved_search_version, canonical_id)
                     );
                     CREATE INDEX idx_alert_outbox_status ON alert_outbox(status, created_at);
                     """
@@ -137,8 +138,8 @@ class SQLiteSavedSearchStore:
             previous_fingerprint = str(existing["query_fingerprint"])
             query_changed = fingerprint != previous_fingerprint
             version = previous_version + 1 if query_changed else previous_version
-            # A materially edited query must establish a new current-results baseline
-            # before it can emit future alerts, avoiding an edit-triggered alert storm.
+            # A materially edited query gets a fresh match namespace and establishes
+            # a new current-results baseline before future alert emission.
             primed = 0 if query_changed else int(existing["primed"])
             created_at = str(existing["created_at"])
 
@@ -176,8 +177,7 @@ class SQLiteSavedSearchStore:
         return normalized
 
     def get(self, saved_search_id: str) -> SavedSearch:
-        row = self._search_row(saved_search_id)
-        return self._saved_from_row(row)
+        return self._saved_from_row(self._search_row(saved_search_id))
 
     def is_primed(self, saved_search_id: str) -> bool:
         return bool(self._search_row(saved_search_id)["primed"])
@@ -207,10 +207,10 @@ class SQLiteSavedSearchStore:
                 self._connection.execute(
                     """
                     INSERT OR IGNORE INTO alert_matches(
-                        saved_search_id, canonical_id, first_matched_version, first_matched_at
+                        saved_search_id, saved_search_version, canonical_id, first_matched_at
                     ) VALUES (?, ?, ?, ?)
                     """,
-                    (saved.saved_search_id, canonical_id, saved.version, occurred),
+                    (saved.saved_search_id, saved.version, canonical_id, occurred),
                 )
             self._connection.execute(
                 "UPDATE saved_searches SET primed = 1, updated_at = ? WHERE saved_search_id = ?",
@@ -236,18 +236,22 @@ class SQLiteSavedSearchStore:
                 if not canonical_id.strip():
                     raise ValueError("canonical_id is required")
                 prior = self._connection.execute(
-                    "SELECT 1 FROM alert_matches WHERE saved_search_id = ? AND canonical_id = ?",
-                    (saved.saved_search_id, canonical_id),
+                    """
+                    SELECT 1 FROM alert_matches
+                    WHERE saved_search_id = ? AND saved_search_version = ? AND canonical_id = ?
+                    """,
+                    (saved.saved_search_id, saved.version, canonical_id),
                 ).fetchone()
                 if prior is not None:
                     continue
-                event_id = self._event_id(saved.saved_search_id, canonical_id)
+                event_id = self._event_id(saved.saved_search_id, saved.version, canonical_id)
                 self._connection.execute(
                     """
-                    INSERT INTO alert_matches(saved_search_id, canonical_id, first_matched_version, first_matched_at)
-                    VALUES (?, ?, ?, ?)
+                    INSERT INTO alert_matches(
+                        saved_search_id, saved_search_version, canonical_id, first_matched_at
+                    ) VALUES (?, ?, ?, ?)
                     """,
-                    (saved.saved_search_id, canonical_id, saved.version, occurred),
+                    (saved.saved_search_id, saved.version, canonical_id, occurred),
                 )
                 self._connection.execute(
                     """
@@ -362,8 +366,10 @@ class SQLiteSavedSearchStore:
         return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
     @staticmethod
-    def _event_id(saved_search_id: str, canonical_id: str) -> str:
-        digest = hashlib.sha256(f"{saved_search_id}|{canonical_id}".encode("utf-8")).hexdigest()[:24]
+    def _event_id(saved_search_id: str, saved_search_version: int, canonical_id: str) -> str:
+        digest = hashlib.sha256(
+            f"{saved_search_id}|{saved_search_version}|{canonical_id}".encode("utf-8")
+        ).hexdigest()[:24]
         return f"ALERT-{digest}"
 
     @staticmethod
