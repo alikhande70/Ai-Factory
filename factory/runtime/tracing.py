@@ -7,9 +7,25 @@ from pathlib import Path
 import sqlite3
 from typing import Any
 
+from .secrets import secret_safe_projection
+
 
 REDACTED = "***REDACTED***"
-SENSITIVE_KEYS = {"auth", "private_value", "access_value", "credential_value"}
+SENSITIVE_KEYS = {
+    "auth",
+    "authorization",
+    "private_value",
+    "access_value",
+    "credential_value",
+    "secret",
+    "secret_value",
+    "token",
+    "access_token",
+    "refresh_token",
+    "api_key",
+    "password",
+    "private_key",
+}
 
 
 def _now() -> str:
@@ -17,6 +33,7 @@ def _now() -> str:
 
 
 def _redact(value: Any) -> Any:
+    value = secret_safe_projection(value)
     if isinstance(value, dict):
         return {
             str(key): (REDACTED if str(key).lower() in SENSITIVE_KEYS else _redact(item))
