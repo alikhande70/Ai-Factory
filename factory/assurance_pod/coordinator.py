@@ -62,6 +62,9 @@ class AssurancePodCoordinator:
             mission_id=design.mission_id,
             reports=tuple(reports),
             implementation_agent_ids=implementation_agent_ids,
+            required_acceptance_criterion_ids=tuple(
+                criterion.criterion_id for criterion in design.acceptance_criteria
+            ),
         )
         if self.catalog is not None:
             self.catalog.add_artifact(
