@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-factory.local/schemas/evidence.schema.json",
+  "title": "EvidenceRecord",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["evidence_id", "mission_id", "task_id", "producer_id", "kind", "summary"],
+  "properties": {
+    "evidence_id": {"type": "string", "minLength": 1},
+    "mission_id": {"type": "string", "minLength": 1},
+    "task_id": {"type": "string", "minLength": 1},
+    "producer_id": {"type": "string", "minLength": 1},
+    "kind": {"enum": ["TEST", "STATIC_ANALYSIS", "DIFF", "LOG", "ARTIFACT", "MANUAL_CHECK"]},
+    "summary": {"type": "string", "minLength": 1},
+    "artifact_refs": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true}
+  }
+}
