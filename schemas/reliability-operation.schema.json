@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-factory.local/schemas/reliability-operation.schema.json",
+  "title": "ReliabilityOperation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["operation_id", "mission_id", "effect_class", "max_attempts", "timeout_seconds", "reconciliation_supported"],
+  "properties": {
+    "operation_id": {"type": "string", "minLength": 1},
+    "mission_id": {"type": "string", "minLength": 1},
+    "effect_class": {"enum": ["READ_ONLY", "LOCAL_WRITE", "EXTERNAL_WRITE"]},
+    "max_attempts": {"type": "integer", "minimum": 1},
+    "timeout_seconds": {"type": "integer", "minimum": 1},
+    "idempotency_key": {"type": ["string", "null"], "minLength": 1},
+    "reconciliation_supported": {"type": "boolean"},
+    "compensation_ref": {"type": ["string", "null"], "minLength": 1}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"effect_class": {"const": "EXTERNAL_WRITE"}}, "required": ["effect_class"]},
+      "then": {
+        "required": ["idempotency_key"],
+        "properties": {
+          "idempotency_key": {"type": "string", "minLength": 1},
+          "reconciliation_supported": {"const": true}
+        }
+      }
+    }
+  ]
+}
