@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-factory.local/schemas/release-preview.schema.json",
+  "title": "ReleasePreviewPlan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["mission_id", "candidate_fingerprint", "reviewed_fingerprint", "assurance_status", "rollback_ref", "environment", "human_approval_granted"],
+  "properties": {
+    "mission_id": {"type": "string", "minLength": 1},
+    "candidate_fingerprint": {"type": "string", "minLength": 1},
+    "reviewed_fingerprint": {"type": "string", "minLength": 1},
+    "assurance_status": {"const": "PASS"},
+    "rollback_ref": {"type": "string", "minLength": 1},
+    "environment": {"type": "string", "minLength": 1},
+    "human_approval_granted": {"type": "boolean"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"environment": {"const": "PRODUCTION"}}, "required": ["environment"]},
+      "then": {"properties": {"human_approval_granted": {"const": true}}}
+    }
+  ]
+}
