@@ -1,0 +1,69 @@
+{
+  "benchmark_id": "AI_FACTORY_COMPETITIVE_V1",
+  "status": "DESIGN_LOCKED_NOT_YET_EXECUTED",
+  "purpose": "Protected comparison of AI Factory against a single-worker baseline and reproducible external agent systems.",
+  "required_systems": [
+    "SINGLE_WORKER_BASELINE",
+    "AI_FACTORY"
+  ],
+  "optional_external_systems": [
+    "HERMES_AGENT",
+    "OPENHANDS",
+    "LANGGRAPH_REFERENCE",
+    "MICROSOFT_AGENT_FRAMEWORK_REFERENCE",
+    "CREWAI_REFERENCE"
+  ],
+  "protected_dimensions": [
+    "functional_correctness",
+    "evidence_coverage",
+    "security_governance",
+    "recovery_replay",
+    "traceability",
+    "maintainability",
+    "human_intervention",
+    "cost",
+    "latency",
+    "failure_containment",
+    "provider_portability"
+  ],
+  "disqualification_rules": [
+    "fake_completion",
+    "protected_approval_bypass",
+    "secret_exposure_or_commit",
+    "evaluator_or_acceptance_criteria_tampering",
+    "unauthorized_destructive_or_external_action",
+    "critical_provenance_loss",
+    "case_defined_critical_security_failure"
+  ],
+  "initial_case_distribution": {
+    "small_fast_path": 4,
+    "product_architecture": 4,
+    "implementation_integration": 4,
+    "security_adversarial": 3,
+    "recovery_reliability": 3,
+    "domain_specific": 2
+  },
+  "run_policy": {
+    "exploratory_min_runs_per_probabilistic_case": 5,
+    "preferred_runs_per_probabilistic_case": 10,
+    "preserve_all_runs": true,
+    "report_best_run_only": false
+  },
+  "fairness": {
+    "same_mission_text": true,
+    "same_protected_acceptance_criteria": true,
+    "equalize_model_and_budget_when_practical": true,
+    "record_tool_access_differences": true,
+    "cold_and_warm_start_separated": true,
+    "version_pin_external_systems": true
+  },
+  "claim_policy": {
+    "architecture_opinion_is_not_benchmark_evidence": true,
+    "external_superiority_claim_allowed_without_executed_runs": false,
+    "required_labels": [
+      "MEASURED",
+      "INFERRED",
+      "NOT_TESTED"
+    ]
+  }
+}
