@@ -32,8 +32,8 @@ def candidate(
     area_sqm: float = 101.0,
     image_hashes: tuple[str, ...] = ("img-a", "img-b", "img-c"),
 ) -> ListingCandidate:
-    updated = NOW - timedelta(days=3)
     verified = NOW - timedelta(days=verified_days_ago)
+    updated = verified - timedelta(days=1)
     return ListingCandidate(
         listing_id=listing_id,
         source_ref=f"source://{listing_id}",
