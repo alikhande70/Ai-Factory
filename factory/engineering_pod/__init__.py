@@ -8,6 +8,7 @@ from .contracts import (
     VerificationResult,
 )
 from .coordinator import EngineeringPodCoordinator
+from .integration import EngineeringIntegrationValidator, IntegratedArtifact, IntegrationManifest
 from .validator import EngineeringFinding, EngineeringPlanValidator
 from .workers import (
     EngineeringPlan,
@@ -36,4 +37,7 @@ __all__ = [
     "EngineeringPodCoordinator",
     "WorkspaceAllocator",
     "WorkspaceAssignment",
+    "EngineeringIntegrationValidator",
+    "IntegratedArtifact",
+    "IntegrationManifest",
 ]
