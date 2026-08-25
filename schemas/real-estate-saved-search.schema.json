@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-factory.local/schemas/real-estate-saved-search.schema.json",
+  "title": "Mission 001 Saved Search",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["saved_search_id", "owner_id", "name", "query"],
+  "properties": {
+    "saved_search_id": {"type": "string", "minLength": 1},
+    "owner_id": {"type": "string", "minLength": 1},
+    "name": {"type": "string", "minLength": 1},
+    "enabled": {"type": "boolean", "default": true},
+    "version": {"type": "integer", "minimum": 1, "default": 1},
+    "query": {
+      "allOf": [
+        {"$ref": "real-estate-search.schema.json"},
+        {
+          "not": {
+            "required": ["cursor"]
+          }
+        }
+      ]
+    }
+  }
+}
