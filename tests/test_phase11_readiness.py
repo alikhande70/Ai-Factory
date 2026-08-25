@@ -88,6 +88,20 @@ class Phase11ReadinessTests(unittest.TestCase):
         self.assertEqual(set(payload), set(schema["required"]))
         self.assertFalse(schema["additionalProperties"])
 
+    def test_current_readiness_snapshot_is_code_qualified_but_not_production_ready(self) -> None:
+        snapshot = json.loads((self.repo_root / "evals" / "phase11" / "readiness_current.json").read_text(encoding="utf-8"))
+        controls = tuple(ReadinessControl(**item) for item in snapshot["controls"])
+        report = evaluate_release_readiness(controls)
+        self.assertEqual(report.stage, snapshot["expected_stage"])
+        self.assertEqual(report.stage, "CODE_QUALIFIED")
+        self.assertTrue(report.code_qualified)
+        self.assertFalse(report.production_ready)
+        blocker_status = {item.control_id: item.status for item in report.blockers}
+        self.assertEqual(blocker_status["github_branch_protection"], "FAIL")
+        self.assertEqual(blocker_status["production_secret_provider"], "UNVERIFIED")
+        self.assertEqual(blocker_status["offsite_recovery"], "UNVERIFIED")
+        self.assertEqual(blocker_status["production_slo_evidence"], "UNVERIFIED")
+
 
 if __name__ == "__main__":
     unittest.main()
