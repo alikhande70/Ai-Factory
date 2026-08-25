@@ -7,6 +7,7 @@ from factory.design_pod.contracts import DesignBundle
 from factory.runtime.catalog import SQLiteRuntimeCatalog
 
 from .contracts import DISCIPLINE_OWNER, EvidenceManifest, ImplementationWorkPackage
+from .integration import EngineeringIntegrationValidator, IntegrationManifest
 from .validator import EngineeringFinding, EngineeringPlanValidator
 from .workers import EngineeringPlan, EngineeringPlannerWorker, EngineeringRevisionRequest, EngineeringWorker
 from .workspace import WorkspaceAllocator, WorkspaceAssignment
@@ -26,6 +27,7 @@ class EngineeringPodCoordinator:
         planner: EngineeringPlannerWorker,
         workers: tuple[EngineeringWorker, ...],
         validator: EngineeringPlanValidator | None = None,
+        integration_validator: EngineeringIntegrationValidator | None = None,
         catalog: SQLiteRuntimeCatalog | None = None,
         workspace_allocator: WorkspaceAllocator | None = None,
         max_plan_revision_rounds: int = 2,
@@ -35,6 +37,7 @@ class EngineeringPodCoordinator:
             raise ValueError("revision limits must be >= 0")
         self.planner = planner
         self.validator = validator or EngineeringPlanValidator()
+        self.integration_validator = integration_validator or EngineeringIntegrationValidator(self.validator)
         self.catalog = catalog
         self.workspace_allocator = workspace_allocator or WorkspaceAllocator()
         self.max_plan_revision_rounds = max_plan_revision_rounds
@@ -127,12 +130,18 @@ class EngineeringPodCoordinator:
                 raise RuntimeError(f"engineering_implementation_revision_no_progress:{package.package_id}")
         raise AssertionError("unreachable implementation revision loop")
 
-    def run(self, *, design: DesignBundle, created_by: str = "ENGINEERING-POD") -> tuple[EvidenceManifest, ...]:
+    def _execute(
+        self,
+        *,
+        design: DesignBundle,
+        created_by: str,
+    ) -> tuple[EngineeringPlan, tuple[ImplementationWorkPackage, ...], tuple[EvidenceManifest, ...]]:
         design.validate()
         plan = self._validated_plan(design=design)
+        execution_order = self._execution_order(plan.packages)
         self.workspace_assignments = {}
         evidence: list[EvidenceManifest] = []
-        for package in self._execution_order(plan.packages):
+        for package in execution_order:
             result = self._run_package(design=design, package=package)
             evidence.append(result)
             if self.catalog is not None:
@@ -143,4 +152,31 @@ class EngineeringPodCoordinator:
                     created_by=created_by,
                     media_type="application/vnd.ai-factory.engineering-evidence+json",
                 )
-        return tuple(evidence)
+        return plan, execution_order, tuple(evidence)
+
+    def run(self, *, design: DesignBundle, created_by: str = "ENGINEERING-POD") -> tuple[EvidenceManifest, ...]:
+        _, _, evidence = self._execute(design=design, created_by=created_by)
+        return evidence
+
+    def run_integrated(
+        self,
+        *,
+        design: DesignBundle,
+        created_by: str = "ENGINEERING-POD",
+    ) -> tuple[tuple[EvidenceManifest, ...], IntegrationManifest]:
+        plan, execution_order, evidence = self._execute(design=design, created_by=created_by)
+        integration = self.integration_validator.integrate(
+            mission_id=design.mission_id,
+            packages=plan.packages,
+            evidence=evidence,
+            package_order=tuple(package.package_id for package in execution_order),
+        )
+        if self.catalog is not None:
+            self.catalog.add_artifact(
+                mission_id=design.mission_id,
+                artifact_id="engineering-integration-manifest",
+                content=json.dumps(asdict(integration), sort_keys=True, separators=(",", ":"), ensure_ascii=False),
+                created_by=created_by,
+                media_type="application/vnd.ai-factory.engineering-integration+json",
+            )
+        return evidence, integration
