@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-factory.local/schemas/backup-manifest.schema.json",
+  "title": "AI Factory SQLite Backup Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format_version",
+    "source_name",
+    "created_at",
+    "sha256",
+    "size_bytes",
+    "sqlite_integrity"
+  ],
+  "properties": {
+    "format_version": {"const": 1},
+    "source_name": {"type": "string", "minLength": 1},
+    "created_at": {"type": "string", "format": "date-time"},
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "size_bytes": {"type": "integer", "minimum": 1},
+    "sqlite_integrity": {"const": "ok"}
+  }
+}
