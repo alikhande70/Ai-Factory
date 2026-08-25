@@ -8,7 +8,8 @@ from factory.engineering_pod import (
 )
 
 
-def work(package_id, owner, discipline, scope, depends_on=()):
+def work(package_id, owner, discipline, scope, depends_on=(), artifact_name=None):
+    expected_artifact = artifact_name or f"artifact-{package_id}"
     return ImplementationWorkPackage(
         package_id=package_id,
         mission_id="MISSION-I",
@@ -18,7 +19,7 @@ def work(package_id, owner, discipline, scope, depends_on=()):
         requirement_ids=("REQ-1",),
         depends_on=depends_on,
         write_scopes=(scope,),
-        expected_artifacts=(f"artifact-{package_id}",),
+        expected_artifacts=(expected_artifact,),
         verification_methods=("unit test",),
     )
 
@@ -28,7 +29,7 @@ def evidence(package, *, path=None, artifact=None, verification_id=None):
     return EvidenceManifest(
         package_id=package.package_id,
         changed_paths=(path or f"{scope}/impl.py",),
-        produced_artifacts=(artifact or f"artifact-{package.package_id}",),
+        produced_artifacts=(artifact or package.expected_artifacts[0],),
         verification_results=(
             VerificationResult(
                 verification_id or f"VER-{package.package_id}",
@@ -92,15 +93,19 @@ class EngineeringIntegrationTests(unittest.TestCase):
             )
 
     def test_ambiguous_artifact_ownership_is_rejected(self):
-        frontend = work("PKG-FE", "A05-FRONTEND", "FRONTEND", "app/frontend")
+        db = work("PKG-DB", "A07-DATABASE", "DATABASE", "app/db", artifact_name="shared-build")
+        frontend = work(
+            "PKG-FE",
+            "A05-FRONTEND",
+            "FRONTEND",
+            "app/frontend",
+            artifact_name="shared-build",
+        )
         with self.assertRaisesRegex(ValueError, "ambiguous artifact ownership"):
             self.validator.integrate(
                 mission_id="MISSION-I",
-                packages=(self.db, frontend),
-                evidence=(
-                    evidence(self.db, artifact="shared-build"),
-                    evidence(frontend, artifact="shared-build"),
-                ),
+                packages=(db, frontend),
+                evidence=(evidence(db), evidence(frontend)),
                 package_order=("PKG-DB", "PKG-FE"),
             )
 
