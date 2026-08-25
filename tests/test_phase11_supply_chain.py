@@ -56,6 +56,13 @@ class Phase11SupplyChainTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "sbom fingerprint mismatch"):
             verify_sbom_fingerprint(tampered)
 
+    def test_sbom_schema_is_value_bounded_and_machine_readable(self) -> None:
+        schema = json.loads((self.repo_root / "schemas" / "sbom.schema.json").read_text(encoding="utf-8"))
+        self.assertEqual(schema["properties"]["format"]["const"], "AI_FACTORY_SBOM_V1")
+        self.assertFalse(schema["additionalProperties"])
+        self.assertEqual(schema["properties"]["github_actions"]["items"]["properties"]["sha"]["pattern"], "^[0-9a-f]{40}$")
+        self.assertEqual(schema["properties"]["fingerprint"]["pattern"], "^[0-9a-f]{64}$")
+
 
 if __name__ == "__main__":
     unittest.main()
