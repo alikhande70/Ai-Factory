@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from contextlib import closing
 from datetime import datetime, timezone
 import json
 from pathlib import Path
@@ -31,7 +32,7 @@ def _redact(value: Any) -> Any:
 class SQLiteTracer:
     def __init__(self, path: str | Path) -> None:
         self.path = str(path)
-        with sqlite3.connect(self.path) as connection:
+        with closing(sqlite3.connect(self.path)) as connection:
             connection.execute(
                 """
                 CREATE TABLE IF NOT EXISTS traces (
@@ -44,21 +45,24 @@ class SQLiteTracer:
                 )
                 """
             )
+            connection.commit()
 
     def trace(self, *, mission_id: str, actor_id: str, event_name: str, payload: dict[str, Any]) -> int:
         if not mission_id or not actor_id or not event_name:
             raise ValueError("mission_id, actor_id and event_name are required")
         safe = _redact(payload)
         encoded = json.dumps(safe, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
-        with sqlite3.connect(self.path) as connection:
+        with closing(sqlite3.connect(self.path)) as connection:
             cursor = connection.execute(
                 "INSERT INTO traces(mission_id,actor_id,event_name,payload_json,created_at) VALUES(?,?,?,?,?)",
                 (mission_id, actor_id, event_name, encoded, _now()),
             )
-            return int(cursor.lastrowid)
+            sequence = int(cursor.lastrowid)
+            connection.commit()
+            return sequence
 
     def events(self, mission_id: str) -> tuple[dict[str, Any], ...]:
-        with sqlite3.connect(self.path) as connection:
+        with closing(sqlite3.connect(self.path)) as connection:
             connection.row_factory = sqlite3.Row
             rows = connection.execute(
                 "SELECT * FROM traces WHERE mission_id=? ORDER BY sequence", (mission_id,)
