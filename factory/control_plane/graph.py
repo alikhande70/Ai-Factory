@@ -24,3 +24,20 @@ def validate_graph(nodes:list[TaskNode])->None:
 def can_run_in_parallel(a:TaskNode,b:TaskNode)->bool:
     if a.task_id in b.dependencies or b.task_id in a.dependencies:return False
     return set(a.write_scopes).isdisjoint(set(b.write_scopes))
+
+def ready_tasks(nodes:tuple[TaskNode,...], states:dict[str,str])->tuple[str,...]:
+    """Return BACKLOG tasks whose dependencies are all DONE.
+
+    The control plane, not an LLM worker, decides dependency readiness.
+    """
+    validate_graph(list(nodes))
+    by_id={node.task_id:node for node in nodes}
+    if set(by_id) != set(states):
+        raise ValueError("states must exactly match graph task ids")
+    ready=[]
+    for task_id,node in by_id.items():
+        if states[task_id] != "BACKLOG":
+            continue
+        if all(states[dep] == "DONE" for dep in node.dependencies):
+            ready.append(task_id)
+    return tuple(sorted(ready))
