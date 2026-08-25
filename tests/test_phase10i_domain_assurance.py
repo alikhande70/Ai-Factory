@@ -34,6 +34,9 @@ def listing(
     price_minor: int,
     rights_basis: RightsBasis = RightsBasis.OWNER_SUBMITTED,
     verified_at: datetime = NOW,
+    locality: str = "District 1",
+    geo_cell: str = "IR-THR-D1-A",
+    image_hashes: tuple[str, ...] = ("shared-image", "img-b", "img-c"),
 ) -> ListingCandidate:
     return ListingCandidate(
         listing_id=listing_id,
@@ -43,14 +46,14 @@ def listing(
         transaction_type="SALE",
         property_type="APARTMENT",
         city="Tehran",
-        locality="District 1",
-        geo_cell="IR-THR-D1-A",
+        locality=locality,
+        geo_cell=geo_cell,
         price_minor=price_minor,
         area_sqm=100.0,
         bedrooms=2,
         title="Two bedroom apartment",
         description="Detailed property description with reviewed disclosures.",
-        image_hashes=("shared-image", "img-b", "img-c"),
+        image_hashes=image_hashes,
         source_updated_at=verified_at - timedelta(minutes=10),
         last_verified_at=verified_at,
         state=ListingState.ACTIVE,
@@ -158,7 +161,9 @@ class Phase10IDomainAssuranceTests(unittest.TestCase):
                 self.assertEqual(fa_doc.structured_data, en_doc.structured_data)
 
                 # Stale canonical inventory must disappear from search/discovery rather
-                # than being revived by presentation/localization layers.
+                # than being revived by presentation/localization layers. Use a distinct
+                # duplicate fingerprint so this is an independent property, not another
+                # source member of the active canonical listing above.
                 stale_canonical = inventory.add_source(
                     listing(
                         listing_id="STALE",
@@ -166,8 +171,12 @@ class Phase10IDomainAssuranceTests(unittest.TestCase):
                         publisher_id="P3",
                         price_minor=90_000_000,
                         verified_at=NOW - timedelta(days=31),
+                        locality="District 5",
+                        geo_cell="IR-THR-D5-A",
+                        image_hashes=("stale-unique", "stale-b", "stale-c"),
                     )
                 )
+                self.assertNotEqual(stale_canonical, canonical)
                 stale_page = search.search(SearchQuery(city="Tehran"), now=NOW)
                 self.assertNotIn(stale_canonical, {result.canonical_id for result in stale_page.results})
                 stale_doc = discovery.listing_document(stale_canonical, now=NOW)
