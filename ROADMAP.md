@@ -1,10 +1,10 @@
-# AI Factory — Master Roadmap v13
+# AI Factory — Master Roadmap v14
 
 > **Status:** Active build  
 > **Current phase:** Phase 10 — Mission 001: Real Estate Intelligence Platform  
-> **Current milestone:** Phase 10-F — Publisher/Consumer UX Contracts & Safe Trust Presentation  
+> **Current milestone:** Phase 10-G — SEO & Discovery Surfaces  
 > **Architecture:** Hybrid deterministic Control Plane + bounded AI workers  
-> **Next milestone:** Build typed consumer/publisher presentation contracts and flows that expose freshness, provenance, disclosure quality and review-safe trust signals without leaking unverified fraud claims or granting presentation code domain authority.  
+> **Next milestone:** Build deterministic, canonical-data-backed discovery documents, stable public route identities, crawl/index eligibility rules, sitemap projections and structured metadata without publishing stale, unauthorized or review-sensitive claims.  
 > **Repository purpose:** Build a reusable AI-native software organization that can turn product missions into verified software without requiring the human owner to manually coordinate every engineering role.
 
 ---
@@ -112,6 +112,7 @@ Roles are logical specialists, not necessarily twelve continuously running proce
 - Domain missions may extend contracts but may not weaken the reusable Factory governance boundary.
 - In Mission 001, suspicion/anomaly score is evidence for review, never an automatic fraud verdict or trust badge.
 - Presentation/UX layers may explain verified state; they may not create trust, verification, fraud, rights or lifecycle facts.
+- Public discovery/SEO surfaces may expose only index-eligible canonical facts; they cannot resurrect stale/withdrawn inventory or convert review evidence into public allegations.
 
 ---
 
@@ -248,27 +249,34 @@ Qualified executable head: `e7d146938ec2e6b0ec7c52270585e3f68cf57503`; GitHub Ac
 
 Evidence: `docs/evaluations/PHASE10E_COMPLETION.md` and `docs/missions/REAL_ESTATE_TRUST.md`.
 
-### Phase 10-F — Publisher/Consumer UX Contracts & Safe Trust Presentation 🚧 CURRENT
+### Phase 10-F — Publisher/Consumer UX Contracts & Safe Trust Presentation ✅ PASS
 
-Goal: turn canonical inventory/search/alert/trust state into clear consumer, publisher and operator-facing contracts without allowing the presentation layer to invent domain truth or overstate trust.
+Qualified capabilities include consumer card/detail projections, freshness/disclosure/provenance signals, safe trust states, no score-derived verification badge, publisher submission validation, canonical lifecycle action projection, internal-vs-external alert status separation, operator stale/current review evidence, machine-readable presentation schemas and a controlled publisher → consumer → review qualification flow.
+
+Qualified executable head: `adfaddda23699bf2113c10878d9728a96d98ab97`; GitHub Actions run `32854114594` succeeded.
+
+Evidence: `docs/evaluations/PHASE10F_COMPLETION.md`.
+
+### Phase 10-G — SEO & Discovery Surfaces 🚧 CURRENT
+
+Goal: expose search-engine/discovery-friendly public documents derived only from index-eligible canonical inventory, without allowing SEO generation to become a parallel source of domain truth.
 
 Required baseline:
-- [ ] typed consumer listing card/detail projections built only from canonical data
-- [ ] explicit freshness, disclosure-quality and provenance presentation fields
-- [ ] safe trust language that distinguishes verified evidence, unknown state and `NEEDS_REVIEW` without emitting an unverified fraud accusation
-- [ ] no verification badge unless evidence-backed publisher trust state explicitly supports it
-- [ ] publisher submission/validation projection showing rights basis, missing disclosure fields and permitted lifecycle actions
-- [ ] saved-search/alert projection that distinguishes internal event creation from external delivery
-- [ ] operator review projection exposing finding evidence, status and stale/current state without domain mutation
-- [ ] deterministic message/status codes separated from localized display strings
-- [ ] machine-readable consumer/publisher/operator presentation schemas
-- [ ] tests proving presentation cannot mutate inventory/trust state or manufacture protected claims
-- [ ] controlled end-to-end UX contract qualification
+- [ ] stable public listing route/canonical URL identity derived from canonical listing ID
+- [ ] deterministic index-eligibility policy that excludes stale, expired, sold/rented/withdrawn or rights-invalid content
+- [ ] canonical listing metadata projection with title/description/location/price and `lastmod` derived from canonical state
+- [ ] structured-data projection with explicit schema version/type and no unsupported trust/fraud claims
+- [ ] sitemap projection containing only index-eligible canonical routes, stable ordering and deterministic `lastmod`
+- [ ] route/metadata escaping and length bounds so listing content cannot inject markup/control metadata
+- [ ] no duplicate source URL surfaces for records collapsed into one canonical listing
+- [ ] noindex explanation codes for ineligible inventory
+- [ ] machine-readable SEO/discovery schemas
+- [ ] regression tests for lifecycle/freshness/rights eligibility, duplicate collapse and stable route identity
+- [ ] controlled discovery qualification proving public documents remain consistent with canonical presentation/domain state
 
 ### Later Mission 001 slices
 
-After 10-F:
-- Phase 10-G SEO/discovery surfaces
+After 10-G:
 - Phase 10-H Localization/market adapters
 - Phase 10-I Domain assurance and bounded full-stack qualification
 
@@ -323,5 +331,6 @@ Before changing AI Factory:
 13. For Mission 001, reject ingestion without an allowed rights basis and never equate model confidence with trust/verification evidence.
 14. Anomaly findings may queue review but cannot by themselves create a fraud verdict, verification badge or destructive listing action.
 15. Presentation contracts may expose canonical facts and reviewed evidence, but must not become a backdoor for creating protected trust/lifecycle/rights state.
+16. SEO/discovery documents must be projections of canonical index-eligible state, never independent content records.
 
-**Current next action:** implement Phase 10-F typed consumer/publisher/operator presentation contracts and tests, beginning with safe trust-state projection and listing-detail provenance/freshness disclosure.
+**Current next action:** implement Phase 10-G index eligibility, stable canonical routes and typed listing metadata/sitemap projections, then qualify them against lifecycle/freshness/rights/duplicate invariants.
