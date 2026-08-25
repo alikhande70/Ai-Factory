@@ -1,11 +1,12 @@
 from __future__ import annotations
 
+from contextlib import contextmanager
 from datetime import datetime, timezone
 import hashlib
 import json
 from pathlib import Path
 import sqlite3
-from typing import Any
+from typing import Any, Iterator
 
 
 def _now() -> str:
@@ -21,13 +22,18 @@ class SQLiteRuntimeCatalog:
         self.path = str(path)
         self._initialize()
 
-    def _connect(self) -> sqlite3.Connection:
+    @contextmanager
+    def _connection(self) -> Iterator[sqlite3.Connection]:
         connection = sqlite3.connect(self.path)
         connection.row_factory = sqlite3.Row
-        return connection
+        try:
+            with connection:
+                yield connection
+        finally:
+            connection.close()
 
     def _initialize(self) -> None:
-        with self._connect() as connection:
+        with self._connection() as connection:
             connection.executescript(
                 """
                 PRAGMA journal_mode=WAL;
@@ -76,7 +82,7 @@ class SQLiteRuntimeCatalog:
     ) -> None:
         if not agent_id or not role:
             raise ValueError("agent_id and role are required")
-        with self._connect() as connection:
+        with self._connection() as connection:
             connection.execute(
                 """
                 INSERT INTO agents(agent_id, role, capabilities_json, active, updated_at)
@@ -91,7 +97,7 @@ class SQLiteRuntimeCatalog:
             )
 
     def get_agent(self, agent_id: str) -> dict[str, Any]:
-        with self._connect() as connection:
+        with self._connection() as connection:
             row = connection.execute("SELECT * FROM agents WHERE agent_id=?", (agent_id,)).fetchone()
         if row is None:
             raise KeyError(agent_id)
@@ -114,7 +120,7 @@ class SQLiteRuntimeCatalog:
         if not mission_id or not artifact_id or not created_by:
             raise ValueError("mission_id, artifact_id and created_by are required")
         digest = hashlib.sha256(content.encode("utf-8")).hexdigest()
-        with self._connect() as connection:
+        with self._connection() as connection:
             connection.execute("BEGIN IMMEDIATE")
             row = connection.execute(
                 "SELECT MAX(version) AS version FROM artifacts WHERE mission_id=? AND artifact_id=?",
@@ -129,7 +135,7 @@ class SQLiteRuntimeCatalog:
         return {"mission_id": mission_id, "artifact_id": artifact_id, "version": version, "content_hash": digest}
 
     def latest_artifact(self, mission_id: str, artifact_id: str) -> dict[str, Any]:
-        with self._connect() as connection:
+        with self._connection() as connection:
             row = connection.execute(
                 "SELECT * FROM artifacts WHERE mission_id=? AND artifact_id=? ORDER BY version DESC LIMIT 1",
                 (mission_id, artifact_id),
@@ -141,7 +147,7 @@ class SQLiteRuntimeCatalog:
     def set_budget(self, mission_id: str, limit_units: int) -> None:
         if limit_units < 0:
             raise ValueError("limit_units must be >= 0")
-        with self._connect() as connection:
+        with self._connection() as connection:
             connection.execute(
                 """
                 INSERT INTO budgets VALUES(?,?,0,?)
@@ -155,7 +161,7 @@ class SQLiteRuntimeCatalog:
     def consume_budget(self, mission_id: str, units: int) -> tuple[int, int]:
         if units <= 0:
             raise ValueError("units must be > 0")
-        with self._connect() as connection:
+        with self._connection() as connection:
             connection.execute("BEGIN IMMEDIATE")
             row = connection.execute("SELECT * FROM budgets WHERE mission_id=?", (mission_id,)).fetchone()
             if row is None:
@@ -179,7 +185,7 @@ class SQLiteRuntimeCatalog:
         target: str,
         protected: bool,
     ) -> None:
-        with self._connect() as connection:
+        with self._connection() as connection:
             try:
                 connection.execute(
                     "INSERT INTO approvals VALUES(?,?,?,?,?,'PENDING',NULL,?,NULL)",
@@ -190,7 +196,7 @@ class SQLiteRuntimeCatalog:
 
     def decide_action(self, proposal_id: str, *, approved: bool, decided_by: str) -> str:
         status = "APPROVED" if approved else "DENIED"
-        with self._connect() as connection:
+        with self._connection() as connection:
             connection.execute("BEGIN IMMEDIATE")
             row = connection.execute("SELECT status FROM approvals WHERE proposal_id=?", (proposal_id,)).fetchone()
             if row is None:
@@ -204,7 +210,7 @@ class SQLiteRuntimeCatalog:
         return status
 
     def approval_status(self, proposal_id: str) -> str:
-        with self._connect() as connection:
+        with self._connection() as connection:
             row = connection.execute("SELECT status FROM approvals WHERE proposal_id=?", (proposal_id,)).fetchone()
         if row is None:
             raise KeyError(proposal_id)
