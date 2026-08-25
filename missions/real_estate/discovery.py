@@ -6,6 +6,7 @@ from enum import Enum
 import html
 import re
 from urllib.parse import urlsplit
+import xml.etree.ElementTree as ET
 
 from .contracts import ListingState, RightsBasis
 from .inventory import InventoryQuery, SQLiteInventoryStore
@@ -21,6 +22,8 @@ _ALLOWED_PUBLIC_RIGHTS = {
     RightsBasis.PARTNER_FEED.value,
     RightsBasis.LICENSED_DATA.value,
 }
+STRUCTURED_DATA_PROFILE = "schema.org-v30.0"
+SITEMAP_NAMESPACE = "http://www.sitemaps.org/schemas/sitemap/0.9"
 
 
 class NoIndexReason(str, Enum):
@@ -41,6 +44,7 @@ class DiscoveryDocument:
     route_path: str
     canonical_url: str
     indexable: bool
+    robots_directive: str
     noindex_reasons: tuple[str, ...]
     title: str
     description: str
@@ -48,6 +52,7 @@ class DiscoveryDocument:
     locality: str
     price_minor: int
     lastmod: str
+    structured_data_profile: str
     structured_data: dict[str, object]
 
 
@@ -126,6 +131,7 @@ class RealEstateDiscoveryService:
             route_path=route,
             canonical_url=canonical_url,
             indexable=eligibility.indexable,
+            robots_directive="index,follow" if eligibility.indexable else "noindex,follow",
             noindex_reasons=tuple(reason.value for reason in eligibility.reasons),
             title=title,
             description=description,
@@ -133,11 +139,11 @@ class RealEstateDiscoveryService:
             locality=detail.locality,
             price_minor=detail.price_minor,
             lastmod=str(canonical["updated_at"]),
+            structured_data_profile=STRUCTURED_DATA_PROFILE,
             structured_data=structured_data,
         )
 
     def sitemap(self, *, now: datetime) -> tuple[SitemapEntry, ...]:
-        # Query canonical public states, then re-apply current freshness/rights policy.
         rows = self._inventory.query(
             InventoryQuery(states=(ListingState.ACTIVE, ListingState.UNDER_OFFER))
         )
@@ -154,6 +160,26 @@ class RealEstateDiscoveryService:
                     )
                 )
         return tuple(sorted(entries, key=lambda entry: entry.loc))
+
+    @staticmethod
+    def render_sitemap_xml(entries: tuple[SitemapEntry, ...]) -> str:
+        """Render sitemap XML from a qualified entry projection.
+
+        ElementTree performs XML escaping for URLs. Only already-qualified entries
+        should reach this renderer; it has no inventory/policy authority itself.
+        """
+
+        ET.register_namespace("", SITEMAP_NAMESPACE)
+        root = ET.Element(f"{{{SITEMAP_NAMESPACE}}}urlset")
+        previous_loc: str | None = None
+        for entry in sorted(entries, key=lambda item: item.loc):
+            if previous_loc == entry.loc:
+                raise ValueError("duplicate sitemap loc is not allowed")
+            previous_loc = entry.loc
+            url = ET.SubElement(root, f"{{{SITEMAP_NAMESPACE}}}url")
+            ET.SubElement(url, f"{{{SITEMAP_NAMESPACE}}}loc").text = entry.loc
+            ET.SubElement(url, f"{{{SITEMAP_NAMESPACE}}}lastmod").text = entry.lastmod
+        return ET.tostring(root, encoding="unicode", xml_declaration=False)
 
     @staticmethod
     def route_for(canonical_id: str) -> str:
