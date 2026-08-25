@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-factory.local/schemas/real-estate-discovery-document.schema.json",
+  "title": "Real Estate Discovery Document",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["canonical_id", "route_path", "canonical_url", "indexable", "noindex_reasons", "title", "description", "city", "locality", "price_minor", "lastmod", "structured_data"],
+  "properties": {
+    "canonical_id": {"type": "string", "pattern": "^CAN-[a-f0-9]{20}$"},
+    "route_path": {"type": "string", "pattern": "^/listing/CAN-[a-f0-9]{20}$"},
+    "canonical_url": {"type": "string", "format": "uri", "pattern": "^https://"},
+    "indexable": {"type": "boolean"},
+    "noindex_reasons": {"type": "array", "uniqueItems": true, "items": {"enum": ["STATE_NOT_PUBLIC", "STALE", "RIGHTS_NOT_PUBLIC"]}},
+    "title": {"type": "string", "maxLength": 70},
+    "description": {"type": "string", "maxLength": 160},
+    "city": {"type": "string"},
+    "locality": {"type": "string"},
+    "price_minor": {"type": "integer", "minimum": 0},
+    "lastmod": {"type": "string", "format": "date-time"},
+    "structured_data": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["@context", "@type", "url", "name", "description"]
+    }
+  }
+}
