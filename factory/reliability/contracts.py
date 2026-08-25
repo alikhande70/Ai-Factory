@@ -8,6 +8,8 @@ ATTEMPT_OUTCOMES = frozenset({"SUCCESS", "RETRYABLE_FAILURE", "TERMINAL_FAILURE"
 RECONCILIATION_RESULTS = frozenset({"APPLIED", "NOT_APPLIED", "UNKNOWN"})
 RECOVERY_ACTIONS = frozenset({"COMPLETE", "RETRY", "RECONCILE", "STOP"})
 CIRCUIT_STATES = frozenset({"CLOSED", "OPEN", "HALF_OPEN"})
+COMPENSATION_STATES = frozenset({"PENDING", "RUNNING", "SUCCEEDED", "FAILED", "NOT_REQUIRED"})
+DEADLINE_RESULTS = frozenset({"WITHIN_DEADLINE", "TIMED_OUT"})
 
 
 @dataclass(frozen=True)
@@ -94,3 +96,66 @@ class RecoveryDecision:
                 raise ValueError("RETRY requires next_attempt >= 2")
         elif self.next_attempt is not None:
             raise ValueError("only RETRY may set next_attempt")
+
+
+@dataclass(frozen=True)
+class DeadlineObservation:
+    operation_id: str
+    attempt: int
+    elapsed_seconds: float
+    timeout_seconds: int
+    result: str
+
+    def validate(self) -> None:
+        if not self.operation_id.strip() or self.attempt < 1:
+            raise ValueError("deadline observation identity is required")
+        if self.elapsed_seconds < 0 or self.timeout_seconds < 1:
+            raise ValueError("deadline values must be non-negative and timeout >= 1")
+        if self.result not in DEADLINE_RESULTS:
+            raise ValueError(f"unknown deadline result:{self.result}")
+        expected = "TIMED_OUT" if self.elapsed_seconds >= self.timeout_seconds else "WITHIN_DEADLINE"
+        if self.result != expected:
+            raise ValueError("deadline result does not match elapsed/timeout values")
+
+
+@dataclass(frozen=True)
+class CompensationPlan:
+    operation_id: str
+    compensation_ref: str
+    reason: str
+    requires_human_approval: bool = False
+
+    def validate(self) -> None:
+        if not self.operation_id.strip() or not self.compensation_ref.strip() or not self.reason.strip():
+            raise ValueError("compensation plan identity, ref and reason are required")
+
+
+@dataclass(frozen=True)
+class CompensationRecord:
+    operation_id: str
+    status: str
+    evidence_ref: str | None = None
+    error_code: str | None = None
+
+    def validate(self) -> None:
+        if not self.operation_id.strip():
+            raise ValueError("operation_id is required")
+        if self.status not in COMPENSATION_STATES:
+            raise ValueError(f"unknown compensation status:{self.status}")
+        if self.status == "SUCCEEDED" and (not self.evidence_ref or not self.evidence_ref.strip()):
+            raise ValueError("successful compensation requires evidence_ref")
+
+
+@dataclass(frozen=True)
+class ReliabilityMetric:
+    mission_id: str
+    name: str
+    value: float
+    operation_id: str | None = None
+    unit: str = "count"
+
+    def validate(self) -> None:
+        if not self.mission_id.strip() or not self.name.strip() or not self.unit.strip():
+            raise ValueError("metric mission_id, name and unit are required")
+        if self.operation_id is not None and not self.operation_id.strip():
+            raise ValueError("operation_id cannot be blank")
