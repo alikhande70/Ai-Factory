@@ -9,6 +9,7 @@ from .integrity import (
 )
 from .inventory import InventoryQuery, PublisherTrustEvidence, SQLiteInventoryStore
 from .ranking import RankingDecision, rank_listing
+from .search import RealEstateSearchService, SearchPage, SearchQuery, SearchResult
 
 __all__ = [
     "FreshnessPolicy",
@@ -17,8 +18,12 @@ __all__ = [
     "ListingState",
     "PublisherTrustEvidence",
     "RankingDecision",
+    "RealEstateSearchService",
     "RightsBasis",
     "SQLiteInventoryStore",
+    "SearchPage",
+    "SearchQuery",
+    "SearchResult",
     "SearchSignals",
     "completeness_score",
     "duplicate_fingerprint",
