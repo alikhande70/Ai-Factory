@@ -36,6 +36,8 @@ class WorkspaceAssignment:
             raise ValueError("workspace scopes must match package scopes")
         if not self.workspace_id.strip() or not self.branch_name.strip():
             raise ValueError("workspace_id and branch_name are required")
+        if self.workspace_id != f"{package.mission_id}:{package.package_id}":
+            raise ValueError("workspace_id must preserve canonical mission/package identity")
         if self.branch_name.startswith("/") or self.branch_name.endswith("/") or ".." in self.branch_name:
             raise ValueError("unsafe branch name")
 
@@ -45,14 +47,14 @@ class WorkspaceAllocator:
 
     def allocate(self, package: ImplementationWorkPackage) -> WorkspaceAssignment:
         package.validate()
-        mission = _slug(package.mission_id)
+        mission_slug = _slug(package.mission_id)
         package_slug = _slug(package.package_id)
         assignment = WorkspaceAssignment(
-            workspace_id=f"{mission}:{package_slug}",
+            workspace_id=f"{package.mission_id}:{package.package_id}",
             mission_id=package.mission_id,
             package_id=package.package_id,
             owner_agent=package.owner_agent,
-            branch_name=f"{self.branch_prefix}/{mission}/{package_slug}",
+            branch_name=f"{self.branch_prefix}/{mission_slug}/{package_slug}",
             write_scopes=package.write_scopes,
         )
         assignment.validate_for(package)
