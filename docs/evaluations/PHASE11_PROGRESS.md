@@ -1,157 +1,106 @@
 # Phase 11 — Production Hardening Progress
 
-**Status:** In progress  
-**Qualified slices:** multi-mission isolation; verified SQLite backup/restore; scoped secret-reference handling; verifiable non-destructive audit archival; durable incident response; deterministic supply-chain/SBOM controls; deterministic SLO evidence contracts; representative CI performance qualification  
-**Not yet complete:** production SLO observation, GitHub repository protection enforcement, external production infrastructure qualification, off-site recovery/RPO-RTO qualification.
+**Code-side verdict:** `CODE_QUALIFIED`  
+**Production verdict:** `NOT_PRODUCTION_READY`  
+**Qualified code slices:** multi-mission isolation; verified SQLite backup/restore; secret-reference isolation; verifiable audit archival; durable incident response; deterministic supply-chain/SBOM controls; SLO evidence contracts; representative CI performance regression; deterministic final readiness gate.  
+**Remaining blockers:** GitHub branch protection, live production secret-provider qualification, off-site recovery/RPO-RTO evidence, production SLO evidence and other external production infrastructure.
+
+## Qualified evidence
+
+| Slice | Qualified head | GitHub Actions |
+|---|---|---|
+| Multi-mission isolation | `37036370c224658df458a7677c16ce7d2f081fb5` | `32856981540` success |
+| Backup/restore integrity | `1cd3aabbb9efe90ef41cbf04ac84ca046f3ccdfa` | `32861957643` success |
+| Secret-reference boundary | `81263dd0ac62b8359e0a2799f88879fbe15f3bc3` | `32868738282` success |
+| Audit archival integrity | `cb629f28faac2980dfddb0c7fbcf6953be056b6b` | `32868992458` success |
+| Incident-response state machine | `8ba20872100eea33c5fc7380033a0497f269465d` | `32869313829` success |
+| Supply-chain/SBOM | `7164da7248e92c76d7596b048d15f7efaebe283c` | `32869793898` success |
+| SLO evidence contract | `03487733f3215c5a76a82b403a0a12c29a0d1ac7` | `32870015401` success |
+| CI performance regression | `fa5768adb72f4e1fa9aa847a74f287f14ce3adfe` | `32870221506` success |
+| Readiness gate/current snapshot | `36dad7240acfb83a349834ae8b816c43a0bf8cdb` | `32870565847` success |
+
+Detailed verdict: `docs/evaluations/PHASE11_CODE_QUALIFIED.md`  
+Machine-readable snapshot: `evals/phase11/readiness_current.json`
 
 ## 1. Multi-mission isolation
 
-The shared runtime catalog is wrapped by mission-scoped access so artifact, budget and approval state cannot be read or mutated across mission boundaries through the public scoped API. Cross-mission approval lookup/decision fails closed.
+The public scoped runtime prevents artifact, budget and approval state from being read or mutated across mission boundaries. Cross-mission approval access fails closed.
 
-Qualified head: `37036370c224658df458a7677c16ce7d2f081fb5`  
-GitHub Actions run: `32856981540` — **success**.
+## 2. Verified backup/restore
 
-## 2. Verified SQLite backup/restore
+`factory/runtime/backup.py` uses SQLite online backup, SHA-256 manifests, integrity checks, staged restore and atomic replacement. Tampered/corrupt snapshots cannot replace a healthy destination and overwrite is explicit.
 
-Phase 11 includes `factory/runtime/backup.py` and `schemas/backup-manifest.schema.json`.
+No off-site replication or measured RPO/RTO is claimed.
 
-Implemented guarantees include SQLite online backup, SHA-256 binding, source/staged integrity checks, tamper rejection, atomic replacement and explicit overwrite. A corrupt snapshot cannot replace a healthy destination.
+## 3. Scoped secret references
 
-Qualified test head: `1cd3aabbb9efe90ef41cbf04ac84ca046f3ccdfa`  
-GitHub Actions run: `32861957643` — **success**.
-
-## 3. Scoped secret-reference handling
-
-Phase 11 includes `factory/runtime/secrets.py` and `schemas/secret-reference.schema.json`.
-
-- Canonical state holds opaque `SecretReference` metadata, never resolved credential values.
-- References are mission-, provider-, purpose- and capability-bound.
-- Cross-mission or missing-capability access fails before provider resolution.
-- The provider interface has no enumeration operation.
-- Raw values exist only inside the trusted broker → executor boundary.
-- Trace and evaluation persistence redact resolved secret material.
-
-Qualified test head: `81263dd0ac62b8359e0a2799f88879fbe15f3bc3`  
-GitHub Actions run: `32868738282` — **success**.
+`factory/runtime/secrets.py` keeps raw credentials outside canonical state. Secret references are mission/capability scoped; cross-mission and missing-capability requests fail before provider resolution; raw material exists only inside the trusted broker→executor boundary. Tracing/evaluation persistence redacts resolved secret material.
 
 No live KMS/Vault/Secrets Manager integration is claimed.
 
 ## 4. Verifiable audit archival
 
-Phase 11 includes `factory/runtime/audit_retention.py` and `schemas/audit-archive-manifest.schema.json`.
+`factory/runtime/audit_retention.py` implements archival-before-deletion. Only a contiguous `GENESIS`-anchored ledger prefix can be archived; source integrity is verified first; the archive is SHA-256 bound to a manifest and independently replayed through the ledger verifier. Canonical rows are not deleted.
 
-Retention is archival-first, not deletion. Only a contiguous `GENESIS`-anchored prefix can be archived; source ledger integrity is verified first; archive bytes are SHA-256 bound to a manifest; archived events are independently replayed through the original hash-chain verifier. Non-monotonic timestamps, archive tampering and manifest tampering fail closed. Canonical audit rows are not deleted.
-
-Qualified test head: `cb629f28faac2980dfddb0c7fbcf6953be056b6b`  
-GitHub Actions run: `32868992458` — **success**.
-
-Destructive audit compaction remains unqualified until archive-anchor recovery and forensics continuity are proven.
+Destructive audit compaction remains unqualified until archive-anchor recovery/forensics continuity is proven.
 
 ## 5. Durable incident response
 
-Phase 11 includes `factory/runtime/incidents.py` and `schemas/incident-record.schema.json`.
-
-Lifecycle:
+`factory/runtime/incidents.py` enforces:
 
 `DECLARED → TRIAGED → CONTAINING → CONTAINED → RECOVERING → MONITORING → CLOSED`
 
-with `MONITORING → RECOVERING` allowed when recovery regresses.
-
-Implemented guarantees:
-
-- explicit severity, mission and affected-resource scope;
-- durable state/evidence/actions across restart;
-- state mutation and per-incident hash-chained event committed together;
-- no incident/evidence/history delete API;
-- exact human approval required for protected containment/recovery actions;
-- cross-mission access fails closed;
-- closure requires recorded evidence plus explicit recovery verification;
-- history mutation is detected.
-
-A qualification-flow bug in the first test was found and corrected before qualification; the corrected suite proves monitoring can begin while closure remains blocked until recovery evidence is recorded and verified.
-
-Qualified test head: `8ba20872100eea33c5fc7380033a0497f269465d`  
-GitHub Actions run: `32869313829` — **success**.
+with `MONITORING → RECOVERING` allowed. State/evidence/actions survive restart; every mutation is transactionally paired with a hash-chained incident event; protected actions require exact human approval; closure requires recorded recovery evidence; cross-mission access and event-history tampering fail closed.
 
 No real production containment action is claimed.
 
-## 6. Deterministic supply-chain inventory and SBOM
+## 6. Supply-chain/SBOM controls
 
-Phase 11 includes `factory/reliability/supply_chain.py` and `schemas/sbom.schema.json`.
+`factory/reliability/supply_chain.py` AST-scans production imports, rejects undeclared external Python dependencies, requires exact 40-character SHA pins for external GitHub Actions and produces a fingerprinted `AI_FACTORY_SBOM_V1` inventory constrained by `schemas/sbom.schema.json`.
 
-Controls:
+The current `factory/` core has zero external Python runtime dependencies under this scanner. A regression test caught that the first workflow scanner missed YAML `- uses:` syntax; the scanner was corrected and the full suite passed.
 
-- AST scan classifies production Python imports as stdlib/internal/external;
-- undeclared external dependencies fail qualification;
-- current `factory/` core has zero external Python runtime dependencies under this scanner;
-- external GitHub Actions must be pinned to exact 40-character commit SHAs;
-- current workflow pins `actions/checkout` and `actions/setup-python` to exact commits;
-- `AI_FACTORY_SBOM_V1` records dependency/action inventory and carries a SHA-256 fingerprint;
-- machine-readable schema constrains the SBOM contract.
+## 7. SLO evidence boundary
 
-The first scanner missed the valid YAML list form `- uses:`. The new regression test exposed it; the scanner was fixed and the full repository suite passed.
-
-Qualified head: `7164da7248e92c76d7596b048d15f7efaebe283c`  
-GitHub Actions run: `32869793898` — **success**.
-
-Exact SHA pinning gives immutability, not permanent runtime-support guarantees.
-
-## 7. Deterministic SLO evidence contracts
-
-Phase 11 includes `factory/reliability/slo.py` and `schemas/slo-evidence.schema.json`.
-
-A typed objective defines operation, p95 latency ceiling, maximum error rate, minimum throughput and minimum sample count. Invalid/NaN measurements, mixed operations and insufficient samples fail qualification. Percentiles and error budget are deterministic.
-
-Most importantly, evidence records its environment. `LOCAL`, `CI` and `STAGING` results are permanently marked `NON_PRODUCTION_QUALIFICATION_ONLY` and code raises if they are presented as production-SLO proof. Production claims require both explicit `PRODUCTION` evidence and full objective qualification.
-
-Qualified head: `03487733f3215c5a76a82b403a0a12c29a0d1ac7`  
-GitHub Actions run: `32870015401` — **success**.
+`factory/reliability/slo.py` defines typed p95 latency, error-rate, throughput and sample-count objectives. Invalid measurements, mixed operations and insufficient samples fail qualification. Local/CI/staging evidence is permanently labeled `NON_PRODUCTION_QUALIFICATION_ONLY`; code raises if it is presented as production-SLO proof.
 
 No production SLO achievement is claimed.
 
-## 8. Representative CI performance qualification
+## 8. Representative CI performance regression
 
-Phase 11 includes `factory/reliability/performance.py` and `tests/test_phase11_performance.py`.
+`factory/reliability/performance.py` records actual monotonic-clock latency, counts failed calls, fingerprints the execution environment and feeds samples into the SLO evaluator. Current CI qualification measures 100 SQLite Runtime Catalog `latest_artifact` reads after warm-up against a deliberately broad regression sentinel: p95 ≤ 100 ms, zero errors, ≥5 ops/s and ≥100 samples.
 
-The harness:
+This is a regression sentinel, not a production capacity benchmark.
 
-- records actual operation latency using a monotonic performance clock;
-- records failures instead of dropping failed samples;
-- fingerprints Python/platform/machine environment metadata;
-- feeds measured samples into the same SLO evidence contract;
-- persists a deterministic JSON report only with explicit overwrite;
-- keeps CI evidence non-production by construction.
+## 9. Deterministic release-readiness gate
 
-The current qualification exercises the SQLite Runtime Catalog `latest_artifact` path for 100 measured operations after warm-up. Its intentionally broad CI regression budget is p95 ≤ 100 ms, zero errors, ≥ 5 ops/s, and ≥ 100 samples. This is a regression sentinel, **not** a production capacity claim.
+`factory/reliability/readiness.py`, `schemas/release-readiness.schema.json` and `evals/phase11/readiness_current.json` now separate code qualification from production readiness.
 
-Qualified head: `fa5768adb72f4e1fa9aa847a74f287f14ce3adfe`  
-GitHub Actions run: `32870221506` — **success**.
+Mandatory code controls must all be `PASS` with evidence. Missing required controls become `UNVERIFIED`; they are never silently omitted. Mandatory production controls are evaluated independently. The current snapshot deterministically evaluates to:
 
-## 9. Repository-governance verification
+`CODE_QUALIFIED`
 
-A direct GitHub branch read reports `main` as **unprotected**, with required status-check enforcement off.
+and `assert_production_ready()` raises because production readiness is not proven.
 
-Current classification: `GITHUB_MAIN_PROTECTION = NOT_ENABLED`.
+## 10. Verified GitHub governance gap
 
-The available repository connector exposes protection reads but no branch-protection write action, so this run cannot truthfully claim to enable it. Repository-side enforcement remains an external governance requirement.
+A direct GitHub branch read reports `main` as **unprotected** and required status-check enforcement as off.
 
-## 10. Boundaries not yet claimed
+Current control state: `github_branch_protection = FAIL`.
 
-Production hardening still does **not** claim:
+The available GitHub connector exposes protection reads but no branch-protection write action, so this repository-level external control cannot truthfully be enabled from this run.
 
-- off-site backup/archive replication;
-- KMS-backed encryption at rest;
-- automated disaster recovery or measured RPO/RTO;
-- live production secret-provider integration;
-- destructive audit compaction;
-- real production incident execution;
-- production load/capacity qualification;
-- production SLO compliance;
-- GitHub branch/review protection enforcement;
-- production deployment.
+## 11. Remaining production blockers
 
-External infrastructure/account actions remain subject to policy and human approval where required.
+The following are intentionally not promoted to PASS:
 
-## 11. Next recommended hardening slice
+- `github_branch_protection` — **FAIL**;
+- `production_secret_provider` — **UNVERIFIED**;
+- `offsite_recovery` — **UNVERIFIED**;
+- `production_slo_evidence` — **UNVERIFIED**.
 
-Close the remaining **code-side** production-hardening gaps without fabricating external readiness: add release-readiness aggregation that refuses `PRODUCTION_READY` while any mandatory external control (branch protection, secret provider, off-site recovery, production SLO evidence) is unverified. This gives the Factory a deterministic final gate that distinguishes `CODE_QUALIFIED` from `PRODUCTION_READY`.
+Also not claimed: production deployment, KMS-backed encryption at rest, destructive audit compaction, real incident containment, legal/commercial readiness or real production traffic capacity.
+
+## 12. Next work
+
+The reusable code-side Phase 11 gate is now qualified. Further progress toward `PRODUCTION_READY` requires external/infrastructure evidence rather than more internal claims: enable and verify repository protection, connect a production secret provider through the qualified interface, establish off-site recovery with measured RPO/RTO, and observe real production/staging-to-production SLO evidence behind the required human/account gates.
