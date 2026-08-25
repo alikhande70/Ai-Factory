@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-factory.local/schemas/real-estate-operator-review.schema.json",
+  "title": "Real Estate Operator Review Projection",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["case_id", "finding_id", "canonical_id", "severity", "status", "assigned_reviewer", "evidence_refs", "evidence_currency", "message_codes"],
+  "properties": {
+    "case_id": {"type": "string", "minLength": 1},
+    "finding_id": {"type": "string", "minLength": 1},
+    "canonical_id": {"type": "string", "minLength": 1},
+    "severity": {"enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL"]},
+    "status": {"enum": ["OPEN", "IN_REVIEW", "RESOLVED", "DISMISSED"]},
+    "assigned_reviewer": {"type": ["string", "null"]},
+    "evidence_refs": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "evidence_currency": {"enum": ["CURRENT", "STALE"]},
+    "message_codes": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+  }
+}
