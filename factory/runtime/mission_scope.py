@@ -65,27 +65,16 @@ class MissionScopedCatalog:
         )
 
     def approval_status(self, proposal_id: str) -> str:
-        row = self._approval_row(proposal_id)
-        return str(row["status"])
+        if not proposal_id:
+            raise ValueError("proposal_id is required")
+        return self.catalog.approval_status(proposal_id, mission_id=self.mission_id)
 
     def decide_action(self, proposal_id: str, *, approved: bool, decided_by: str) -> str:
-        self._approval_row(proposal_id)
+        if not proposal_id:
+            raise ValueError("proposal_id is required")
         return self.catalog.decide_action(
             proposal_id,
             approved=approved,
             decided_by=decided_by,
+            mission_id=self.mission_id,
         )
-
-    def _approval_row(self, proposal_id: str) -> dict[str, Any]:
-        if not proposal_id:
-            raise ValueError("proposal_id is required")
-        with self.catalog._connection() as connection:
-            row = connection.execute(
-                "SELECT proposal_id, mission_id, status FROM approvals WHERE proposal_id=?",
-                (proposal_id,),
-            ).fetchone()
-        if row is None:
-            raise KeyError(proposal_id)
-        if str(row["mission_id"]) != self.mission_id:
-            raise PermissionError("cross_mission_access_denied")
-        return dict(row)
