@@ -9,6 +9,7 @@ from factory.runtime.catalog import SQLiteRuntimeCatalog
 from .contracts import DISCIPLINE_OWNER, EvidenceManifest, ImplementationWorkPackage
 from .validator import EngineeringFinding, EngineeringPlanValidator
 from .workers import EngineeringPlan, EngineeringPlannerWorker, EngineeringRevisionRequest, EngineeringWorker
+from .workspace import WorkspaceAllocator, WorkspaceAssignment
 
 
 class EngineeringPodCoordinator:
@@ -26,6 +27,7 @@ class EngineeringPodCoordinator:
         workers: tuple[EngineeringWorker, ...],
         validator: EngineeringPlanValidator | None = None,
         catalog: SQLiteRuntimeCatalog | None = None,
+        workspace_allocator: WorkspaceAllocator | None = None,
         max_plan_revision_rounds: int = 2,
         max_implementation_revision_rounds: int = 2,
     ) -> None:
@@ -34,9 +36,11 @@ class EngineeringPodCoordinator:
         self.planner = planner
         self.validator = validator or EngineeringPlanValidator()
         self.catalog = catalog
+        self.workspace_allocator = workspace_allocator or WorkspaceAllocator()
         self.max_plan_revision_rounds = max_plan_revision_rounds
         self.max_implementation_revision_rounds = max_implementation_revision_rounds
         self.workers = {worker.agent_id: worker for worker in workers}
+        self.workspace_assignments: dict[str, WorkspaceAssignment] = {}
 
     @staticmethod
     def _blocking(findings: tuple[EngineeringFinding, ...]) -> tuple[EngineeringFinding, ...]:
@@ -93,8 +97,10 @@ class EngineeringPodCoordinator:
         if worker.agent_id != package.owner_agent or worker.discipline != package.discipline:
             raise RuntimeError(f"engineering_worker_identity_mismatch:{package.package_id}")
 
-        workspace_id = f"{design.mission_id}:{package.package_id}"
-        evidence = worker.implement(design=design, package=package, workspace_id=workspace_id)
+        assignment = self.workspace_allocator.allocate(package)
+        assignment.validate_for(package)
+        self.workspace_assignments[package.package_id] = assignment
+        evidence = worker.implement(design=design, package=package, workspace_id=assignment.workspace_id)
         for round_number in range(self.max_implementation_revision_rounds + 1):
             blockers = self._blocking(self.validator.validate_evidence(package=package, evidence=evidence))
             if not blockers:
@@ -113,7 +119,7 @@ class EngineeringPodCoordinator:
             evidence = revise(
                 design=design,
                 package=package,
-                workspace_id=workspace_id,
+                workspace_id=assignment.workspace_id,
                 previous_evidence=previous,
                 request=EngineeringRevisionRequest(round_number=round_number + 1, findings=blockers),
             )
@@ -124,6 +130,7 @@ class EngineeringPodCoordinator:
     def run(self, *, design: DesignBundle, created_by: str = "ENGINEERING-POD") -> tuple[EvidenceManifest, ...]:
         design.validate()
         plan = self._validated_plan(design=design)
+        self.workspace_assignments = {}
         evidence: list[EvidenceManifest] = []
         for package in self._execution_order(plan.packages):
             result = self._run_package(design=design, package=package)
