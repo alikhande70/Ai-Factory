@@ -12,7 +12,7 @@ class BookingRecord:
 
 
 class BookingRepository:
-    """Tiny transactional repository used only for the controlled Phase 4 evaluation."""
+    """Tiny transactional repository used by controlled Factory qualification fixtures."""
 
     def __init__(self, database_path: str) -> None:
         self.database_path = database_path
@@ -36,6 +36,49 @@ class BookingRepository:
                     )
                     """
                 )
+                connection.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS schema_migrations (
+                        migration_id TEXT PRIMARY KEY,
+                        applied_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+                    )
+                    """
+                )
+        finally:
+            connection.close()
+
+    def apply_add_notes_migration(self) -> bool:
+        """Apply a controlled idempotent migration; returns True only on first application."""
+        migration_id = "2026-08-add-booking-notes"
+        connection = self._connect()
+        try:
+            with connection:
+                seen = connection.execute(
+                    "SELECT 1 FROM schema_migrations WHERE migration_id=?", (migration_id,)
+                ).fetchone()
+                if seen is not None:
+                    return False
+                columns = {
+                    str(row["name"])
+                    for row in connection.execute("PRAGMA table_info(bookings)").fetchall()
+                }
+                if "notes" not in columns:
+                    connection.execute("ALTER TABLE bookings ADD COLUMN notes TEXT")
+                connection.execute(
+                    "INSERT INTO schema_migrations(migration_id) VALUES(?)", (migration_id,)
+                )
+            return True
+        finally:
+            connection.close()
+
+    def has_column(self, column_name: str) -> bool:
+        connection = self._connect()
+        try:
+            columns = {
+                str(row["name"])
+                for row in connection.execute("PRAGMA table_info(bookings)").fetchall()
+            }
+            return column_name in columns
         finally:
             connection.close()
 
