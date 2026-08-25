@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-factory.local/schemas/sbom.schema.json",
+  "title": "AI Factory Deterministic SBOM",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format", "python", "github_actions", "fingerprint"],
+  "properties": {
+    "format": {"const": "AI_FACTORY_SBOM_V1"},
+    "python": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["external_dependencies", "standard_library_imports", "internal_roots"],
+      "properties": {
+        "external_dependencies": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+        "standard_library_imports": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+        "internal_roots": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true}
+      }
+    },
+    "github_actions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["action", "sha"],
+        "properties": {
+          "action": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+          "sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+        }
+      }
+    },
+    "fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}
