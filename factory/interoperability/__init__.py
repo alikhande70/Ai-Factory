@@ -9,6 +9,8 @@ from .contracts import (
     ExternalTaskRequest,
 )
 from .mcp import MCPAdapter, SUPPORTED_MCP_VERSION
+from .policy import InteropPolicyDecision, InteropPolicyGuard
+from .reliability import InteropReliabilityBridge
 
 __all__ = [
     "A2AAdapter",
@@ -20,4 +22,7 @@ __all__ = [
     "ExternalTaskRequest",
     "MCPAdapter",
     "SUPPORTED_MCP_VERSION",
+    "InteropPolicyDecision",
+    "InteropPolicyGuard",
+    "InteropReliabilityBridge",
 ]
