@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-factory.local/schemas/event.schema.json",
+  "title": "TypedEvent",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["event_id", "mission_id", "actor_id", "event_type", "payload"],
+  "properties": {
+    "event_id": {"type": "string", "minLength": 1},
+    "mission_id": {"type": "string", "minLength": 1},
+    "actor_id": {"type": "string", "minLength": 1},
+    "event_type": {"type": "string", "minLength": 1},
+    "payload": {"type": "object"}
+  }
+}
