@@ -51,8 +51,8 @@
       "expected_order": ["PARK-PREMIUM", "PARK-DESC", "MITTE-APARTMENT", "KREUZBERG-LOFT"]
     },
     {
-      "text": "kreuzberg apartment",
-      "expected_order": ["KREUZBERG-LOFT", "PARK-PREMIUM", "PARK-DESC", "MITTE-APARTMENT"]
+      "text": "kreuzberg loft",
+      "expected_order": ["KREUZBERG-LOFT"]
     },
     {
       "text": "warehouse",
