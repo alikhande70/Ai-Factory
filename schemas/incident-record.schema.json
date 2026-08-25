@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-factory.local/schemas/incident-record.schema.json",
+  "title": "AI Factory Incident Record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["incident_id","mission_id","severity","title","status","declared_by","affected_scope","recovery_verified","created_at","updated_at"],
+  "properties": {
+    "incident_id": {"type": "string", "minLength": 1},
+    "mission_id": {"type": "string", "minLength": 1},
+    "severity": {"enum": ["SEV1","SEV2","SEV3","SEV4"]},
+    "title": {"type": "string", "minLength": 1},
+    "status": {"enum": ["DECLARED","TRIAGED","CONTAINING","CONTAINED","RECOVERING","MONITORING","CLOSED"]},
+    "declared_by": {"type": "string", "minLength": 1},
+    "affected_scope": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+    "recovery_verified": {"type": "boolean"},
+    "created_at": {"type": "string", "format": "date-time"},
+    "updated_at": {"type": "string", "format": "date-time"}
+  }
+}
