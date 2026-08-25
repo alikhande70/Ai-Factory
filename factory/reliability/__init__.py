@@ -6,12 +6,16 @@ from .contracts import (
     OperationSpec,
     RecoveryDecision,
 )
+from .controller import DurableOperationController
 from .engine import ReliabilityDecisionEngine
+from .store import SQLiteReliabilityStore
 
 __all__ = [
     "AttemptRecord",
     "CircuitBreakerState",
     "OperationSpec",
     "RecoveryDecision",
+    "DurableOperationController",
     "ReliabilityDecisionEngine",
+    "SQLiteReliabilityStore",
 ]
