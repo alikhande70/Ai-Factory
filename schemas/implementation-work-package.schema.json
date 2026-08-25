@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-factory.local/schemas/implementation-work-package.schema.json",
+  "title": "ImplementationWorkPackage",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["package_id", "mission_id", "owner_agent", "discipline", "objective", "requirement_ids", "depends_on", "write_scopes", "expected_artifacts", "verification_methods"],
+  "properties": {
+    "package_id": {"type": "string", "minLength": 1},
+    "mission_id": {"type": "string", "minLength": 1},
+    "owner_agent": {"enum": ["A05-FRONTEND", "A06-BACKEND", "A07-DATABASE", "A08-AI-AUTOMATION"]},
+    "discipline": {"enum": ["FRONTEND", "BACKEND", "DATABASE", "AI_AUTOMATION"]},
+    "objective": {"type": "string", "minLength": 1},
+    "requirement_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "depends_on": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "write_scopes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "expected_artifacts": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "verification_methods": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+  }
+}
